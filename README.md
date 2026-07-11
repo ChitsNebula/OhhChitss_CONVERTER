@@ -51,5 +51,5 @@ pyinstaller --noconsole --onefile --name="OhhChitss_CONVERTER_V1.0" spike_gui.py
 
 ---
 
-### พัฒนาโดย Antigravity 
+### พัฒนาโดย Nebula 
 *สร้างขึ้นเพื่ออำนวยความสะดวกสำหรับผู้ใช้งานหุ่นยนต์ LEGO SPIKE Prime ในการเปลี่ยนผ่านจากภาษาบล็อกสู่การเขียนโค้ดเต็มรูปแบบ*

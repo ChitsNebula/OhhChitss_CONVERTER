@@ -110,7 +110,7 @@ class ModernDecompilerGUI:
         # Footer (Renamed to OhhChitss CONVERTER V1.0)
         footer_label = tk.Label(
             self.root,
-            text="OhhChitss CONVERTER V1.0",
+            text="OhhChitss CONVERTER V1.0 | พัฒนาโดย Nebula",
             font=("Consolas", 8),
             fg="#5A616A",
             bg="#0C0D0E"
