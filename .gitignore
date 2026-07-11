@@ -4,3 +4,7 @@ __pycache__/
 build/
 dist/
 *.spec
+files/
+lessons.db
+lessons.json
+scrape_primelessons.py
