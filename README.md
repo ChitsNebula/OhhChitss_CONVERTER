@@ -1,37 +1,55 @@
-# Prime Lessons Reference Database
+# OhhChitss CONVERTER V1.0 ⚡
 
-This folder contains a reference database of Scratch Word Blocks and Python programming lessons parsed from [primelessons.org](https://primelessons.org).
+โปรแกรมแปลงไฟล์โปรเจกต์หุ่นยนต์ LEGO SPIKE Prime จากภาษาบล็อกคำสั่ง (Word Blocks) เป็นภาษา Python สำเร็จรูปในรูปแบบไฟล์โปรเจกต์ `.llsp3` ที่สามารถนำไปใช้เปิดต่อในแอพพลิเคชันหรือหน้าเว็บ SPIKE Prime ได้ทันที!
 
-## Folder Structure
+---
 
-- `lessons.db`: SQLite 3 database containing the parsed lessons metadata.
-- `lessons.json`: JSON document list of all lessons.
-- `files/`: Contains the downloaded PPTX and PDF slide files.
-- `README.md`: This documentation file.
-- `scrape_primelessons.py`: Scraper script used to build and update this database.
+## 🌟 คุณสมบัติเด่น (Features)
 
-## Database Schema (`lessons`)
+* **แปลงโค้ดครบวงจร**: แกะโครงสร้างบล็อก Scratch (Word Blocks) และแปลออกมาเป็นคำสั่ง Python ที่ถูกต้องตามไลบรารีของ SPIKE Prime
+* **ทำความสะอาดตัวแปรอัตโนมัติ**: ตัวแปรในบล็อกคำสั่งที่ใช้ภาษาไทย มีเว้นวรรค หรือมีเครื่องหมายขีดลบ (`-`) ซึ่ง Python ไม่อนุญาตให้ใช้ จะถูกแปลงเป็นรูปแบบงูเลื้อย (Snake Case) ที่ถูกต้องให้อัตโนมัติ เช่น `reflec ดำ` ➔ `reflec_ดำ`
+* **รองรับ My Blocks (บล็อกส่วนตัว)**: แปลงฟังก์ชันที่สร้างขึ้นมาใช้งานเอง เช่น ฟังก์ชันเดินตามเส้น (Line Follower) หรือระบบคุมมุมเลี้ยวหุ่นยนต์ (LQR/Gyro Turn) ออกมาเป็นโครงสร้าง `def` ใน Python พร้อมคิวรี่พอร์ตและทิศทางมอเตอร์ได้ถูกต้องแม่นยำ
+* **หน้าตาโปรแกรมสุดคูล (Sleek UI)**: หน้าต่างโปรแกรมคุมโทนสีดำ-เหลือง สไตล์ SPIKE Prime พร้อมเอฟเฟกต์ไฟกะพริบ LED (Breathing animation) และลำแสงเลเซอร์แสกนทำความสะอาดโค้ดขณะประมวลผล
+* **ไฟล์เดี่ยวพร้อมใช้ (.EXE)**: คอมไพล์เป็นไฟล์พกพา standalone ไม่จำเป็นต้องลง Python หรือไลบรารีเสริมในเครื่องคอมพิวเตอร์ก็เปิดรันได้ทันที
 
-The SQLite database `lessons.db` contains a table named `lessons` with the following columns:
+---
 
-| Column Name | Type | Description |
-|---|---|---|
-| `id` | INTEGER | Auto-incrementing primary key |
-| `category` | TEXT | Programming language category (`Word Blocks` or `Python`) |
-| `unit` | TEXT | Unit name |
-| `title` | TEXT | Lesson title |
-| `pptx_filename` | TEXT | Filename of local PPTX file |
-| `pptx_local_path` | TEXT | Relative path to local PPTX file |
-| `pptx_remote_url` | TEXT | Original URL of PPTX file |
-| `pdf_filename` | TEXT | Filename of local PDF file |
-| `pdf_local_path` | TEXT | Relative path to local PDF file |
-| `pdf_remote_url` | TEXT | Original URL of PDF file |
-| `other_links` | TEXT | JSON string array of other associated resources |
+## 📂 โครงสร้างโปรเจกต์ (Folder Structure)
 
-## Quick SQLite Query Example
+* `OhhChitss_CONVERTER_V1.0.exe` : ตัวโปรแกรมแปลงไฟล์สำเร็จรูปสำหรับ Windows (เปิดใช้งานได้เลย)
+* `spike_gui.py` : ซอร์สโค้ดหน้าต่างโปรแกรม (GUI) เขียนด้วย Tkinter
+* `spike_decompiler.py` : ซอร์สโค้ดสมองกลหลักที่ใช้ดีคอมไพล์บล็อก Scratch เป็น Python และแพ็กเกจเป็น `.llsp3`
+* `run_converter_gui.bat` : สคริปต์ทางลัดสำหรับเปิดรันผ่านไฟล์ไพทอนแบบไม่มีหน้าต่างคอนโซล
 
-You can query the database using SQLite, for example:
+---
 
-```sql
-SELECT category, unit, title, pdf_filename FROM lessons WHERE category = 'Python' LIMIT 5;
+## 🚀 วิธีใช้งานโปรแกรม (How to Use)
+
+### วิธีสำหรับผู้ใช้งานทั่วไป (ง่ายที่สุด)
+1. ดาวน์โหลดไฟล์ **`OhhChitss_CONVERTER_V1.0.exe`** ไปไว้ในเครื่องคอมพิวเตอร์ของคุณ
+2. ดับเบิลคลิกเปิดโปรแกรมขึ้นมา
+3. กดปุ่ม **📁 Select File** และเลือกไฟล์โปรเจกต์บล็อกคำสั่ง `.llsp3` ที่คุณต้องการแปลง
+4. ปุ่มแปลงจะเปิดใช้งานเป็นสีเหลืองสว่าง ให้กดปุ่ม **⚡ Convert & Save**
+5. จะมีเอฟเฟกต์เลเซอร์สแกนรันตรวจโค้ด จากนั้นระบบจะแสดงหน้าต่างให้เลือกที่จัดเก็บไฟล์ปลายทาง ให้เลือกโฟลเดอร์และตั้งชื่อไฟล์ตามต้องการ (ไฟล์จะถูกเซฟเป็นสกุล `_python.llsp3` โดยอัตโนมัติ)
+6. นำไฟล์ที่ได้ไปนำเข้า (Import) ในแอพหรือเว็บ SPIKE Prime เพื่อใช้งานหรือจูนค่าต่อได้เลย!
+
+### วิธีสำหรับนักพัฒนา (Developer Run)
+หากต้องการรันโปรแกรมจากซอร์สโค้ด ให้ติดตั้งไพทอนในเครื่องคอมพิวเตอร์และรันคำสั่ง:
+```bash
+python spike_gui.py
 ```
+
+---
+
+## 🛠️ วิธีการบิวด์เป็นไฟล์ EXE ใหม่
+หากมีการแก้ไขซอร์สโค้ดและต้องการแพ็กเกจใหม่ ให้ติดตั้ง PyInstaller และรันคำสั่ง:
+```bash
+pip install pyinstaller
+pyinstaller --noconsole --onefile --name="OhhChitss_CONVERTER_V1.0" spike_gui.py
+```
+ไฟล์ EXE ใหม่จะถูกบิวด์มาเก็บไว้ที่โฟลเดอร์ `dist/`
+
+---
+
+### พัฒนาโดย Antigravity 
+*สร้างขึ้นเพื่ออำนวยความสะดวกสำหรับผู้ใช้งานหุ่นยนต์ LEGO SPIKE Prime ในการเปลี่ยนผ่านจากภาษาบล็อกสู่การเขียนโค้ดเต็มรูปแบบ*
