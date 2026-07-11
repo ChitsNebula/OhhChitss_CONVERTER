@@ -1,0 +1,1278 @@
+[
+  {
+    "category": "Word Blocks",
+    "unit": "General",
+    "title": "SPIKE Prime vs. EV3",
+    "pptx": {
+      "filename": "SPIKEPrimevsEV3.pptx",
+      "local_path": "files\\SPIKEPrimevsEV3.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPIKEPrimevsEV3.pptx"
+    },
+    "pdf": {
+      "filename": "SPIKEPrimevsEV3.pdf",
+      "local_path": "files\\SPIKEPrimevsEV3.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPIKEPrimevsEV3.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "General",
+    "title": "SPIKE Prime vs. Robot Inventor",
+    "pptx": {
+      "filename": "SPvs51515.pptx",
+      "local_path": "files\\SPvs51515.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPvs51515.pptx"
+    },
+    "pdf": {
+      "filename": "SPvs51515.pdf",
+      "local_path": "files\\SPvs51515.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPvs51515.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "General",
+    "title": "SPIKE Prime Block Guide",
+    "pptx": null,
+    "pdf": {
+      "filename": "SP2BlockGuide.pdf",
+      "local_path": "files\\SP2BlockGuide.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP2BlockGuide.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "General",
+    "title": "SPIKE 2 vs. SPIKE 3 and Downgrading Your Hub",
+    "pptx": {
+      "filename": "SP3DowngradingHub.pptx",
+      "local_path": "files\\SP3DowngradingHub.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3DowngradingHub.pptx"
+    },
+    "pdf": {
+      "filename": "SP3DowngradingHub.pdf",
+      "local_path": "files\\SP3DowngradingHub.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3DowngradingHub.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 1: Getting Started",
+    "title": "How to Use these Lessons",
+    "pptx": {
+      "filename": "HowtoUse.pptx",
+      "local_path": "files\\HowtoUse.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/HowtoUse.pptx"
+    },
+    "pdf": {
+      "filename": "HowtoUse.pdf",
+      "local_path": "files\\HowtoUse.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/HowtoUse.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 1: Getting Started",
+    "title": "Building a Robot",
+    "pptx": {
+      "filename": "BuildingARobot.pptx",
+      "local_path": "files\\BuildingARobot.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/BuildingARobot.pptx"
+    },
+    "pdf": {
+      "filename": "BuildingARobot.pdf",
+      "local_path": "files\\BuildingARobot.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/BuildingARobot.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 1: Getting Started",
+    "title": "How to Create a Robot in CAD",
+    "pptx": {
+      "filename": "CAD.pptx",
+      "local_path": "files\\CAD.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/CAD.pptx"
+    },
+    "pdf": {
+      "filename": "CAD.pdf",
+      "local_path": "files\\CAD.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/CAD.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 1: Getting Started",
+    "title": "Easier Building with SPIKE Prime and Robot Inventor",
+    "pptx": {
+      "filename": "NewElements.pptx",
+      "local_path": "files\\NewElements.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/NewElements.pptx"
+    },
+    "pdf": {
+      "filename": "NewElements.pdf",
+      "local_path": "files\\NewElements.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/NewElements.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 1: Getting Started",
+    "title": "Installing Software and Firmware",
+    "pptx": {
+      "filename": "SoftwareandFirmware.pptx",
+      "local_path": "files\\SoftwareandFirmware.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SoftwareandFirmware.pptx"
+    },
+    "pdf": {
+      "filename": "SoftwareandFirmware.pdf",
+      "local_path": "files\\SoftwareandFirmware.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SoftwareandFirmware.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 2: Introduction to Hub and Software",
+    "title": "Introduction to Hub and Software",
+    "pptx": {
+      "filename": "IntroductiontoHubandSoftware.pptx",
+      "local_path": "files\\IntroductiontoHubandSoftware.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/IntroductiontoHubandSoftware.pptx"
+    },
+    "pdf": {
+      "filename": "IntroductiontoHubandSoftware.pdf",
+      "local_path": "files\\IntroductiontoHubandSoftware.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/IntroductiontoHubandSoftware.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 2: Introduction to Hub and Software",
+    "title": "Managing Projects",
+    "pptx": {
+      "filename": "SP3ManagingProjects.pptx",
+      "local_path": "files\\SP3ManagingProjects.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3ManagingProjects.pptx"
+    },
+    "pdf": {
+      "filename": "SP3ManagingProjects.pdf",
+      "local_path": "files\\SP3ManagingProjects.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3ManagingProjects.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 2: Introduction to Hub and Software",
+    "title": "Viewing Sensor Values",
+    "pptx": {
+      "filename": "ViewingSensorValues.pptx",
+      "local_path": "files\\ViewingSensorValues.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ViewingSensorValues.pptx"
+    },
+    "pdf": {
+      "filename": "ViewingSensorValues.pdf",
+      "local_path": "files\\ViewingSensorValues.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ViewingSensorValues.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 3: Beginner Movement",
+    "title": "Configuring Robot Movement",
+    "pptx": {
+      "filename": "ConfiguringRobotMovement.pptx",
+      "local_path": "files\\ConfiguringRobotMovement.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ConfiguringRobotMovement.pptx"
+    },
+    "pdf": {
+      "filename": "ConfiguringRobotMovement.pdf",
+      "local_path": "files\\ConfiguringRobotMovement.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ConfiguringRobotMovement.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 3: Beginner Movement",
+    "title": "Moving Straight",
+    "pptx": {
+      "filename": "MovingStraight.pptx",
+      "local_path": "files\\MovingStraight.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/MovingStraight.pptx"
+    },
+    "pdf": {
+      "filename": "MovingStraight.pdf",
+      "local_path": "files\\MovingStraight.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/MovingStraight.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 3: Beginner Movement",
+    "title": "Turning with Gyro",
+    "pptx": {
+      "filename": "GyroTurning.pptx",
+      "local_path": "files\\GyroTurning.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/GyroTurning.pptx"
+    },
+    "pdf": {
+      "filename": "GyroTurning.pdf",
+      "local_path": "files\\GyroTurning.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/GyroTurning.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 3: Beginner Movement",
+    "title": "More Accurate Turns",
+    "pptx": {
+      "filename": "AccurateTurning.pptx",
+      "local_path": "files\\AccurateTurning.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/AccurateTurning.pptx"
+    },
+    "pdf": {
+      "filename": "AccurateTurning.pdf",
+      "local_path": "files\\AccurateTurning.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/AccurateTurning.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 3: Beginner Movement",
+    "title": "Gyro Drift",
+    "pptx": {
+      "filename": "SP3GyroDrift.pptx",
+      "local_path": "files\\SP3GyroDrift.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3GyroDrift.pptx"
+    },
+    "pdf": {
+      "filename": "SP3GyroDrift.pdf",
+      "local_path": "files\\SP3GyroDrift.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3GyroDrift.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 4: Good Practices",
+    "title": "Backing Up Files - IPad and Chromebook",
+    "pptx": {
+      "filename": "BackingUpFiles.pptx",
+      "local_path": "files\\BackingUpFiles.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/BackingUpFiles.pptx"
+    },
+    "pdf": {
+      "filename": "BackingUpFiles.pdf",
+      "local_path": "files\\BackingUpFiles.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/BackingUpFiles.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 4: Good Practices",
+    "title": "Printing Code",
+    "pptx": {
+      "filename": "PrintingCode.pptx",
+      "local_path": "files\\PrintingCode.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/PrintingCode.pptx"
+    },
+    "pdf": {
+      "filename": "PrintingCode.pdf",
+      "local_path": "files\\PrintingCode.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/PrintingCode.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 4: Good Practices",
+    "title": "Pseudocode",
+    "pptx": {
+      "filename": "Pseudocode.pptx",
+      "local_path": "files\\Pseudocode.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Pseudocode.pptx"
+    },
+    "pdf": {
+      "filename": "Pseudocode.pdf",
+      "local_path": "files\\Pseudocode.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Pseudocode.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 4: Good Practices",
+    "title": "Commenting Code",
+    "pptx": {
+      "filename": "Comments.pptx",
+      "local_path": "files\\Comments.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Comments.pptx"
+    },
+    "pdf": {
+      "filename": "Comments.pdf",
+      "local_path": "files\\Comments.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Comments.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 5: Sensors",
+    "title": "Introduction to Force Sensor",
+    "pptx": {
+      "filename": "ForceSensor.pptx",
+      "local_path": "files\\ForceSensor.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ForceSensor.pptx"
+    },
+    "pdf": {
+      "filename": "ForceSensor.pdf",
+      "local_path": "files\\ForceSensor.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ForceSensor.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 5: Sensors",
+    "title": "Introduction to Color Sensor",
+    "pptx": {
+      "filename": "ColorSensor.pptx",
+      "local_path": "files\\ColorSensor.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ColorSensor.pptx"
+    },
+    "pdf": {
+      "filename": "ColorSensor.pdf",
+      "local_path": "files\\ColorSensor.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ColorSensor.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 5: Sensors",
+    "title": "Introduction to Distance Sensor",
+    "pptx": {
+      "filename": "DistanceSensor.pptx",
+      "local_path": "files\\DistanceSensor.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/DistanceSensor.pptx"
+    },
+    "pdf": {
+      "filename": "DistanceSensor.pdf",
+      "local_path": "files\\DistanceSensor.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/DistanceSensor.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 6: Intermediate Programming",
+    "title": "Using Repeat Blocks",
+    "pptx": {
+      "filename": "RepeatBlocks.pptx",
+      "local_path": "files\\RepeatBlocks.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/RepeatBlocks.pptx"
+    },
+    "pdf": {
+      "filename": "RepeatBlocks.pdf",
+      "local_path": "files\\RepeatBlocks.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/RepeatBlocks.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 6: Intermediate Programming",
+    "title": "Using Sound Blocks",
+    "pptx": {
+      "filename": "SoundBlocks.pptx",
+      "local_path": "files\\SoundBlocks.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SoundBlocks.pptx"
+    },
+    "pdf": {
+      "filename": "SoundBlocks.pdf",
+      "local_path": "files\\SoundBlocks.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SoundBlocks.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 6: Intermediate Programming",
+    "title": "Using Light Blocks",
+    "pptx": {
+      "filename": "LightBlocks.pptx",
+      "local_path": "files\\LightBlocks.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/LightBlocks.pptx"
+    },
+    "pdf": {
+      "filename": "LightBlocks.pdf",
+      "local_path": "files\\LightBlocks.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/LightBlocks.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 6: Intermediate Programming",
+    "title": "Using If-Then Blocks",
+    "pptx": {
+      "filename": "IfThenBlocks.pptx",
+      "local_path": "files\\IfThenBlocks.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/IfThenBlocks.pptx"
+    },
+    "pdf": {
+      "filename": "IfThenBlocks.pdf",
+      "local_path": "files\\IfThenBlocks.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/IfThenBlocks.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 7: Intermediate Movement",
+    "title": "Moving Object with Stall Detection",
+    "pptx": {
+      "filename": "MovingObjectsStall.pptx",
+      "local_path": "files\\MovingObjectsStall.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/MovingObjectsStall.pptx"
+    },
+    "pdf": {
+      "filename": "MovingObjectsStall.pdf",
+      "local_path": "files\\MovingObjectsStall.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/MovingObjectsStall.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 7: Intermediate Movement",
+    "title": "Basic Line Follower",
+    "pptx": {
+      "filename": "LineFollower.pptx",
+      "local_path": "files\\LineFollower.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/LineFollower.pptx"
+    },
+    "pdf": {
+      "filename": "LineFollower.pdf",
+      "local_path": "files\\LineFollower.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/LineFollower.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 7: Intermediate Movement",
+    "title": "Challenges",
+    "pptx": {
+      "filename": "Challenges.pptx",
+      "local_path": "files\\Challenges.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Challenges.pptx"
+    },
+    "pdf": {
+      "filename": "Challenges.pdf",
+      "local_path": "files\\Challenges.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Challenges.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 8: Advanced Programming",
+    "title": "Introduction to Events",
+    "pptx": {
+      "filename": "EventsIntro.pptx",
+      "local_path": "files\\EventsIntro.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/EventsIntro.pptx"
+    },
+    "pdf": {
+      "filename": "EventsIntro.pdf",
+      "local_path": "files\\EventsIntro.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/EventsIntro.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 8: Advanced Programming",
+    "title": "Event Synchronization",
+    "pptx": {
+      "filename": "EventsSync.pptx",
+      "local_path": "files\\EventsSync.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/EventsSync.pptx"
+    },
+    "pdf": {
+      "filename": "EventsSync.pdf",
+      "local_path": "files\\EventsSync.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/EventsSync.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 8: Advanced Programming",
+    "title": "Variables",
+    "pptx": {
+      "filename": "Variables.pptx",
+      "local_path": "files\\Variables.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Variables.pptx"
+    },
+    "pdf": {
+      "filename": "Variables.pdf",
+      "local_path": "files\\Variables.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Variables.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 8: Advanced Programming",
+    "title": "My Blocks",
+    "pptx": {
+      "filename": "MyBlocks.pptx",
+      "local_path": "files\\MyBlocks.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/MyBlocks.pptx"
+    },
+    "pdf": {
+      "filename": "MyBlocks.pdf",
+      "local_path": "files\\MyBlocks.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/MyBlocks.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 9: Advanced Movement",
+    "title": "Acceleration",
+    "pptx": {
+      "filename": "Accelerate.pptx",
+      "local_path": "files\\Accelerate.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Accelerate.pptx"
+    },
+    "pdf": {
+      "filename": "Accelerate.pdf",
+      "local_path": "files\\Accelerate.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Accelerate.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 9: Advanced Movement",
+    "title": "Squaring on a Line",
+    "pptx": {
+      "filename": "SquaringonLine.pptx",
+      "local_path": "files\\SquaringonLine.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SquaringonLine.pptx"
+    },
+    "pdf": {
+      "filename": "SquaringonLine.pdf",
+      "local_path": "files\\SquaringonLine.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SquaringonLine.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 9: Advanced Movement",
+    "title": "Proportional Line Follower",
+    "pptx": {
+      "filename": "ProportionalLineFollower.pptx",
+      "local_path": "files\\ProportionalLineFollower.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ProportionalLineFollower.pptx"
+    },
+    "pdf": {
+      "filename": "ProportionalLineFollower.pdf",
+      "local_path": "files\\ProportionalLineFollower.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ProportionalLineFollower.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 9: Advanced Movement",
+    "title": "Gyro Move Straight",
+    "pptx": {
+      "filename": "GyroMoveStraight.pptx",
+      "local_path": "files\\GyroMoveStraight.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/GyroMoveStraight.pptx"
+    },
+    "pdf": {
+      "filename": "GyroMoveStraight.pdf",
+      "local_path": "files\\GyroMoveStraight.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/GyroMoveStraight.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 9: Advanced Movement",
+    "title": "PID Line Follower",
+    "pptx": {
+      "filename": "PIDLineFollower.pptx",
+      "local_path": "files\\PIDLineFollower.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/PIDLineFollower.pptx"
+    },
+    "pdf": {
+      "filename": "PIDLineFollower.pdf",
+      "local_path": "files\\PIDLineFollower.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/PIDLineFollower.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 10: Additional Competition Skills",
+    "title": "Debugging",
+    "pptx": {
+      "filename": "Debugging.pptx",
+      "local_path": "files\\Debugging.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Debugging.pptx"
+    },
+    "pdf": {
+      "filename": "Debugging.pdf",
+      "local_path": "files\\Debugging.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Debugging.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Word Blocks",
+    "unit": "Unit 10: Additional Competition Skills",
+    "title": "Reliability",
+    "pptx": {
+      "filename": "Reliability.pptx",
+      "local_path": "files\\Reliability.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Reliability.pptx"
+    },
+    "pdf": {
+      "filename": "Reliability.pdf",
+      "local_path": "files\\Reliability.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Reliability.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "General",
+    "title": "SPIKE Prime vs. EV3",
+    "pptx": {
+      "filename": "SPIKEPrimevsEV3.pptx",
+      "local_path": "files\\SPIKEPrimevsEV3.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPIKEPrimevsEV3.pptx"
+    },
+    "pdf": {
+      "filename": "SPIKEPrimevsEV3.pdf",
+      "local_path": "files\\SPIKEPrimevsEV3.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPIKEPrimevsEV3.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "General",
+    "title": "SPIKE Prime vs. Robot Inventor",
+    "pptx": {
+      "filename": "SPvs51515.pptx",
+      "local_path": "files\\SPvs51515.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPvs51515.pptx"
+    },
+    "pdf": {
+      "filename": "SPvs51515.pdf",
+      "local_path": "files\\SPvs51515.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SPvs51515.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "General",
+    "title": "SPIKE 2 vs. SPIKE 3 and Downgrading Your Hub",
+    "pptx": {
+      "filename": "SP3DowngradingHub.pptx",
+      "local_path": "files\\SP3DowngradingHub.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3DowngradingHub.pptx"
+    },
+    "pdf": {
+      "filename": "SP3DowngradingHub.pdf",
+      "local_path": "files\\SP3DowngradingHub.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3DowngradingHub.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 1: Overview",
+    "title": "How to Use these Lessons",
+    "pptx": {
+      "filename": "HowtoUse.pptx",
+      "local_path": "files\\HowtoUse.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/HowtoUse.pptx"
+    },
+    "pdf": {
+      "filename": "HowtoUse.pdf",
+      "local_path": "files\\HowtoUse.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/HowtoUse.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 1: Overview",
+    "title": "Building a Robot",
+    "pptx": {
+      "filename": "BuildingARobot.pptx",
+      "local_path": "files\\BuildingARobot.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/BuildingARobot.pptx"
+    },
+    "pdf": {
+      "filename": "BuildingARobot.pdf",
+      "local_path": "files\\BuildingARobot.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/BuildingARobot.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 1: Overview",
+    "title": "How to Create a Robot in CAD",
+    "pptx": {
+      "filename": "CAD.pptx",
+      "local_path": "files\\CAD.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/CAD.pptx"
+    },
+    "pdf": {
+      "filename": "CAD.pdf",
+      "local_path": "files\\CAD.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/CAD.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 1: Overview",
+    "title": "Easier Building with SPIKE Prime and Robot Inventor",
+    "pptx": {
+      "filename": "NewElements.pptx",
+      "local_path": "files\\NewElements.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/NewElements.pptx"
+    },
+    "pdf": {
+      "filename": "NewElements.pdf",
+      "local_path": "files\\NewElements.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/NewElements.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 1: Overview",
+    "title": "Installing Software and Firmware",
+    "pptx": {
+      "filename": "SoftwareandFirmware.pptx",
+      "local_path": "files\\SoftwareandFirmware.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SoftwareandFirmware.pptx"
+    },
+    "pdf": {
+      "filename": "SoftwareandFirmware.pdf",
+      "local_path": "files\\SoftwareandFirmware.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SoftwareandFirmware.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 2: Introduction to Software and Hub",
+    "title": "Introduction to Hub and Software",
+    "pptx": {
+      "filename": "IntroductiontoHubandSoftwarePython.pptx",
+      "local_path": "files\\IntroductiontoHubandSoftwarePython.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/IntroductiontoHubandSoftwarePython.pptx"
+    },
+    "pdf": {
+      "filename": "IntroductiontoHubandSoftwarePython.pdf",
+      "local_path": "files\\IntroductiontoHubandSoftwarePython.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/IntroductiontoHubandSoftwarePython.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 2: Introduction to Software and Hub",
+    "title": "Managing Projects",
+    "pptx": {
+      "filename": "SP3ManagingProjects.pptx",
+      "local_path": "files\\SP3ManagingProjects.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3ManagingProjects.pptx"
+    },
+    "pdf": {
+      "filename": "SP3ManagingProjects.pdf",
+      "local_path": "files\\SP3ManagingProjects.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/SP3ManagingProjects.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 2: Introduction to Software and Hub",
+    "title": "Viewing Sensor Values",
+    "pptx": {
+      "filename": "ViewingSensorValues.pptx",
+      "local_path": "files\\ViewingSensorValues.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ViewingSensorValues.pptx"
+    },
+    "pdf": {
+      "filename": "ViewingSensorValues.pdf",
+      "local_path": "files\\ViewingSensorValues.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/ViewingSensorValues.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Data Types and Variables",
+    "pptx": {
+      "filename": "DataTypesVariables.pptx",
+      "local_path": "files\\DataTypesVariables.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/DataTypesVariables.pptx"
+    },
+    "pdf": {
+      "filename": "DataTypesVariables.pdf",
+      "local_path": "files\\DataTypesVariables.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/DataTypesVariables.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Conditionals",
+    "pptx": {
+      "filename": "Conditionals.pptx",
+      "local_path": "files\\Conditionals.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Conditionals.pptx"
+    },
+    "pdf": {
+      "filename": "Conditionals.pdf",
+      "local_path": "files\\Conditionals.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Conditionals.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Using Loops",
+    "pptx": {
+      "filename": "Loops.pptx",
+      "local_path": "files\\Loops.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Loops.pptx"
+    },
+    "pdf": {
+      "filename": "Loops.pdf",
+      "local_path": "files\\Loops.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Loops.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Functions",
+    "pptx": {
+      "filename": "Functions.pptx",
+      "local_path": "files\\Functions.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Functions.pptx"
+    },
+    "pdf": {
+      "filename": "Functions.pdf",
+      "local_path": "files\\Functions.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Functions.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Lists and Tuples",
+    "pptx": {
+      "filename": "ListsTuples.pptx",
+      "local_path": "files\\ListsTuples.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ListsTuples.pptx"
+    },
+    "pdf": {
+      "filename": "ListsTuples.pdf",
+      "local_path": "files\\ListsTuples.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ListsTuples.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Dictionaries and Sets",
+    "pptx": {
+      "filename": "DictsSets.pptx",
+      "local_path": "files\\DictsSets.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/DictsSets.pptx"
+    },
+    "pdf": {
+      "filename": "DictsSets.pdf",
+      "local_path": "files\\DictsSets.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/DictsSets.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Object Oriented Programming",
+    "pptx": {
+      "filename": "OOP.pptx",
+      "local_path": "files\\OOP.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/OOP.pptx"
+    },
+    "pdf": {
+      "filename": "OOP.pdf",
+      "local_path": "files\\OOP.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/OOP.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Recursion",
+    "pptx": {
+      "filename": "Recursion.pptx",
+      "local_path": "files\\Recursion.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Recursion.pptx"
+    },
+    "pdf": {
+      "filename": "Recursion.pdf",
+      "local_path": "files\\Recursion.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Recursion.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Commenting Code",
+    "pptx": {
+      "filename": "Comments.pptx",
+      "local_path": "files\\Comments.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Comments.pptx"
+    },
+    "pdf": {
+      "filename": "Comments.pdf",
+      "local_path": "files\\Comments.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/Comments.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 3: Introduction to Python",
+    "title": "Importing Custom Libraries",
+    "pptx": {
+      "filename": "ImportingCustomLibraries.pptx",
+      "local_path": "files\\ImportingCustomLibraries.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ImportingCustomLibraries.pptx"
+    },
+    "pdf": {
+      "filename": "ImportingCustomLibraries.pdf",
+      "local_path": "files\\ImportingCustomLibraries.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ImportingCustomLibraries.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 4: Movement",
+    "title": "Configuring Robot Movement",
+    "pptx": {
+      "filename": "ConfiguringRobotMovement.pptx",
+      "local_path": "files\\ConfiguringRobotMovement.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ConfiguringRobotMovement.pptx"
+    },
+    "pdf": {
+      "filename": "ConfiguringRobotMovement.pdf",
+      "local_path": "files\\ConfiguringRobotMovement.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ConfiguringRobotMovement.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 4: Movement",
+    "title": "Moving Straight",
+    "pptx": {
+      "filename": "MovingStraight.pptx",
+      "local_path": "files\\MovingStraight.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/MovingStraight.pptx"
+    },
+    "pdf": {
+      "filename": "MovingStraight.pdf",
+      "local_path": "files\\MovingStraight.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/MovingStraight.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 4: Movement",
+    "title": "Turning with Gyro",
+    "pptx": {
+      "filename": "GyroTurning.pptx",
+      "local_path": "files\\GyroTurning.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/GyroTurning.pptx"
+    },
+    "pdf": {
+      "filename": "GyroTurning.pdf",
+      "local_path": "files\\GyroTurning.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/GyroTurning.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 4: Movement",
+    "title": "More Accurate Turns",
+    "pptx": {
+      "filename": "AccurateTurning.pptx",
+      "local_path": "files\\AccurateTurning.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/AccurateTurning.pptx"
+    },
+    "pdf": {
+      "filename": "AccurateTurning.pdf",
+      "local_path": "files\\AccurateTurning.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/AccurateTurning.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Introduction to Force Sensor",
+    "pptx": {
+      "filename": "ForceSensor.pptx",
+      "local_path": "files\\ForceSensor.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ForceSensor.pptx"
+    },
+    "pdf": {
+      "filename": "ForceSensor.pdf",
+      "local_path": "files\\ForceSensor.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ForceSensor.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Introduction to Color Sensor",
+    "pptx": {
+      "filename": "ColorSensor.pptx",
+      "local_path": "files\\ColorSensor.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ColorSensor.pptx"
+    },
+    "pdf": {
+      "filename": "ColorSensor.pdf",
+      "local_path": "files\\ColorSensor.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ColorSensor.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Introduction to Distance Sensor",
+    "pptx": {
+      "filename": "DistanceSensor.pptx",
+      "local_path": "files\\DistanceSensor.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/DistanceSensor.pptx"
+    },
+    "pdf": {
+      "filename": "DistanceSensor.pdf",
+      "local_path": "files\\DistanceSensor.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/DistanceSensor.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Using Speaker Functions",
+    "pptx": {
+      "filename": "SpeakerFunctions.pptx",
+      "local_path": "files\\SpeakerFunctions.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/SpeakerFunctions.pptx"
+    },
+    "pdf": {
+      "filename": "SpeakerFunctions.pdf",
+      "local_path": "files\\SpeakerFunctions.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/SpeakerFunctions.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Using Light Functions",
+    "pptx": {
+      "filename": "LightFunctions.pptx",
+      "local_path": "files\\LightFunctions.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/LightFunctions.pptx"
+    },
+    "pdf": {
+      "filename": "LightFunctions.pdf",
+      "local_path": "files\\LightFunctions.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/LightFunctions.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Basic Line Follower",
+    "pptx": {
+      "filename": "LineFollower.pptx",
+      "local_path": "files\\LineFollower.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/LineFollower.pptx"
+    },
+    "pdf": {
+      "filename": "LineFollower.pdf",
+      "local_path": "files\\LineFollower.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/LineFollower.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 5: Sensors and Outputs",
+    "title": "Challenges",
+    "pptx": {
+      "filename": "Challenges.pptx",
+      "local_path": "files\\Challenges.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Challenges.pptx"
+    },
+    "pdf": {
+      "filename": "Challenges.pdf",
+      "local_path": "files\\Challenges.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Challenges.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 6: Advanced Programming",
+    "title": "Moving Object with Stall Detection",
+    "pptx": {
+      "filename": "MovingObjectsStall.pptx",
+      "local_path": "files\\MovingObjectsStall.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/MovingObjectsStall.pptx"
+    },
+    "pdf": {
+      "filename": "MovingObjectsStall.pdf",
+      "local_path": "files\\MovingObjectsStall.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/MovingObjectsStall.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 6: Advanced Programming",
+    "title": "Squaring on a Line",
+    "pptx": {
+      "filename": "SquaringonLine.pptx",
+      "local_path": "files\\SquaringonLine.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/SquaringonLine.pptx"
+    },
+    "pdf": {
+      "filename": "SquaringonLine.pdf",
+      "local_path": "files\\SquaringonLine.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/SquaringonLine.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 6: Advanced Programming",
+    "title": "Proportional Line Follower",
+    "pptx": {
+      "filename": "ProportionalLineFollower.pptx",
+      "local_path": "files\\ProportionalLineFollower.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ProportionalLineFollower.pptx"
+    },
+    "pdf": {
+      "filename": "ProportionalLineFollower.pdf",
+      "local_path": "files\\ProportionalLineFollower.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/ProportionalLineFollower.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 6: Advanced Programming",
+    "title": "Gyro Move Straight",
+    "pptx": {
+      "filename": "GyroMoveStraight.pptx",
+      "local_path": "files\\GyroMoveStraight.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/GyroMoveStraight.pptx"
+    },
+    "pdf": {
+      "filename": "GyroMoveStraight.pdf",
+      "local_path": "files\\GyroMoveStraight.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/GyroMoveStraight.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 6: Advanced Programming",
+    "title": "PID Line Follower",
+    "pptx": {
+      "filename": "PIDLineFollower.pptx",
+      "local_path": "files\\PIDLineFollower.pptx",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/PIDLineFollower.pptx"
+    },
+    "pdf": {
+      "filename": "PIDLineFollower.pdf",
+      "local_path": "files\\PIDLineFollower.pdf",
+      "remote_url": "https://primelessons.org/en/PyProgrammingLessons/PIDLineFollower.pdf"
+    },
+    "other_links": []
+  },
+  {
+    "category": "Python",
+    "unit": "Unit 6: Advanced Programming",
+    "title": "Reliability",
+    "pptx": {
+      "filename": "Reliability.pptx",
+      "local_path": "files\\Reliability.pptx",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Reliability.pptx"
+    },
+    "pdf": {
+      "filename": "Reliability.pdf",
+      "local_path": "files\\Reliability.pdf",
+      "remote_url": "https://primelessons.org/en/ProgrammingLessons/Reliability.pdf"
+    },
+    "other_links": []
+  }
+]
