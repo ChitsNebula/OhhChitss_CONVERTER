@@ -814,7 +814,12 @@ class Recompiler:
 
 def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
     try:
-        # Read Python source from .llsp3 (Python)
+        # Read Python source and original metadata from .llsp3 (Python)
+        orig_manifest = None
+        orig_monitors = None
+        orig_icon = None
+        orig_scratch_bytes = None
+
         with zipfile.ZipFile(input_llsp3_path, "r") as z:
             names = z.namelist()
             if "projectbody.json" in names:
@@ -822,6 +827,15 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
                 python_code = body.get("main", "")
             else:
                 return False, "ไม่พบ projectbody.json — อาจไม่ใช่ไฟล์ Python llsp3"
+            
+            if "orig_manifest.json" in names:
+                orig_manifest = json.loads(z.read("orig_manifest.json"))
+            if "orig_monitors.json" in names:
+                orig_monitors = z.read("orig_monitors.json")
+            if "orig_icon.svg" in names:
+                orig_icon = z.read("orig_icon.svg")
+            if "orig_scratch.sb3" in names:
+                orig_scratch_bytes = z.read("orig_scratch.sb3")
 
         rc = Recompiler()
         blocks, variables, warnings = rc.compile(python_code)
@@ -835,108 +849,151 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
             else:
                 var_entries[vid] = [name, 0]
 
-        costume = {
-            "name": "costume1",
-            "bitmapResolution": 1,
-            "dataFormat": "svg",
-            "assetId": "d41d8cd98f00b204e9800998ecf8427e",
-            "md5ext": "d41d8cd98f00b204e9800998ecf8427e.svg",
-            "rotationCenterX": 0,
-            "rotationCenterY": 0
-        }
+        # Use original project.json as base if available
+        orig_proj = None
+        other_sb3_files = {}
+        if orig_scratch_bytes:
+            try:
+                with zipfile.ZipFile(io.BytesIO(orig_scratch_bytes), "r") as s:
+                    for sname in s.namelist():
+                        if sname == "project.json":
+                            orig_proj = json.loads(s.read(sname))
+                        else:
+                            other_sb3_files[sname] = s.read(sname)
+            except Exception:
+                pass
 
-        project = {
-            "targets": [
-                {
-                    "isStage": True,
-                    "name": "Stage",
-                    "variables": {}, "lists": {}, "broadcasts": {}, "blocks": {},
-                    "comments": {}, "currentCostume": 0,
-                    "costumes": [costume], "sounds": [],
-                    "volume": 100, "layerOrder": 0,
-                    "tempo": 60, "videoTransparency": 50,
-                    "videoState": "on", "textToSpeechLanguage": None
-                },
-                {
-                    "isStage": False,
-                    "name": "Sprite1",
-                    "variables": var_entries,
-                    "lists": list_entries,
-                    "broadcasts": {},
-                    "blocks": blocks,
-                    "comments": {}, "currentCostume": 0,
-                    "costumes": [costume], "sounds": [],
-                    "volume": 100, "layerOrder": 1,
-                    "visible": True,
-                    "x": 0,
-                    "y": 0,
-                    "size": 100,
-                    "direction": 90,
-                    "draggable": False,
-                    "rotationStyle": "all around"
-                }
-            ],
-
-            "monitors": [],
-            "extensions": [
-                "flippermove", "flippermotor", "flippermoremotor",
-                "flippermoremove", "flippersensors", "flippercontrol",
-                "flipperevents", "flipperdisplay", "flippersound"
-            ],
-            "meta": {
-                "semver": "3.0.0",
-                "vm": "1.2.58",
-                "agent": ""
+        if orig_proj:
+            project = orig_proj
+            # Replace target blocks, variables, and lists
+            sprite_target = None
+            for t in project["targets"]:
+                if not t.get("isStage"):
+                    sprite_target = t
+                    break
+            if sprite_target:
+                sprite_target["variables"] = var_entries
+                sprite_target["lists"] = list_entries
+                sprite_target["blocks"] = blocks
+        else:
+            costume = {
+                "name": "costume1",
+                "bitmapResolution": 1,
+                "dataFormat": "svg",
+                "assetId": "d41d8cd98f00b204e9800998ecf8427e",
+                "md5ext": "d41d8cd98f00b204e9800998ecf8427e.svg",
+                "rotationCenterX": 0,
+                "rotationCenterY": 0
             }
-        }
+            project = {
+                "targets": [
+                    {
+                        "isStage": True,
+                        "name": "Stage",
+                        "variables": {}, "lists": {}, "broadcasts": {}, "blocks": {},
+                        "comments": {}, "currentCostume": 0,
+                        "costumes": [costume], "sounds": [],
+                        "volume": 100, "layerOrder": 0,
+                        "tempo": 60, "videoTransparency": 50,
+                        "videoState": "on", "textToSpeechLanguage": None
+                    },
+                    {
+                        "isStage": False,
+                        "name": "Sprite1",
+                        "variables": var_entries,
+                        "lists": list_entries,
+                        "broadcasts": {},
+                        "blocks": blocks,
+                        "comments": {}, "currentCostume": 0,
+                        "costumes": [costume], "sounds": [],
+                        "volume": 100, "layerOrder": 1,
+                        "visible": True,
+                        "x": 0,
+                        "y": 0,
+                        "size": 100,
+                        "direction": 90,
+                        "draggable": False,
+                        "rotationStyle": "all around"
+                    }
+                ],
+                "monitors": [],
+                "extensions": [
+                    "flippermove", "flippermotor", "flippermoremotor",
+                    "flippermoremove", "flippersensors", "flippercontrol",
+                    "flipperevents", "flipperdisplay", "flippersound"
+                ],
+                "meta": {
+                    "semver": "3.0.0",
+                    "vm": "1.2.58",
+                    "agent": ""
+                }
+            }
 
         # Pack scratch.sb3
         sb3_buf = io.BytesIO()
         with zipfile.ZipFile(sb3_buf, "w", zipfile.ZIP_DEFLATED) as sb3_zip:
             sb3_zip.writestr("project.json", json.dumps(project))
-            sb3_zip.writestr("d41d8cd98f00b204e9800998ecf8427e.svg", "")
+            # Write other assets back
+            for sname, sdata in other_sb3_files.items():
+                sb3_zip.writestr(sname, sdata)
+            # Ensure blank svg is there if no assets were extracted
+            if "d41d8cd98f00b204e9800998ecf8427e.svg" not in other_sb3_files and not orig_proj:
+                sb3_zip.writestr("d41d8cd98f00b204e9800998ecf8427e.svg", "")
         sb3_bytes = sb3_buf.getvalue()
 
         # Manifest
         project_name = os.path.splitext(os.path.basename(output_llsp3_path))[0]
         now_str = datetime.datetime.utcnow().isoformat(timespec='milliseconds') + "Z"
-        pid = gen_id(length=12)
-        manifest = {
-            "type": "word-blocks",
-            "autoDelete": False,
-            "created": now_str,
-            "id": pid,
-            "lastsaved": now_str,
-            "size": 0,
-            "name": project_name,
-            "slotIndex": 0,
-            "workspaceX": 120,
-            "workspaceY": 120,
-            "zoomLevel": 0.5,
-            "hardware": {},
-            "state": {
-                "playMode": "download",
-                "canvasDrawerOpen": False
-            },
-            "extraFiles": [],
-            "lastConnectedHubType": "flipper"
-        }
+        
+        if orig_manifest:
+            manifest = orig_manifest
+            manifest["name"] = project_name
+            manifest["lastsaved"] = now_str
+        else:
+            pid = gen_id(length=12)
+            manifest = {
+                "type": "word-blocks",
+                "autoDelete": False,
+                "created": now_str,
+                "id": pid,
+                "lastsaved": now_str,
+                "size": 0,
+                "name": project_name,
+                "slotIndex": 0,
+                "workspaceX": 120,
+                "workspaceY": 120,
+                "zoomLevel": 0.5,
+                "hardware": {},
+                "state": {
+                    "playMode": "download",
+                    "canvasDrawerOpen": False
+                },
+                "extraFiles": [],
+                "lastConnectedHubType": "flipper"
+            }
 
+        if orig_icon:
+            icon_svg = orig_icon
+        else:
+            icon_svg = ('<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg">'
+                        '<rect width="60" height="60" rx="8" fill="#F3BD41"/>'
+                        '<text x="30" y="38" font-size="24" text-anchor="middle" fill="#1A1A1A">⬛</text>'
+                        '</svg>').encode('utf-8')
 
-        icon_svg = ('<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg">'
-                    '<rect width="60" height="60" rx="8" fill="#F3BD41"/>'
-                    '<text x="30" y="38" font-size="24" text-anchor="middle" fill="#1A1A1A">⬛</text>'
-                    '</svg>')
-
-        monitors_json = json.dumps([])
+        if orig_monitors:
+            monitors_json = orig_monitors
+        else:
+            monitors_json = json.dumps([]).encode('utf-8')
 
         with zipfile.ZipFile(output_llsp3_path, "w", zipfile.ZIP_DEFLATED) as out_zip:
             out_zip.writestr("manifest.json", json.dumps(manifest, indent=2))
             out_zip.writestr("scratch.sb3", sb3_bytes)
+            # Write icon and monitors (write accepts bytes or string)
             out_zip.writestr("icon.svg", icon_svg)
             out_zip.writestr("monitors.json", monitors_json)
 
         return True, warnings
+
 
     except SyntaxError as e:
         return False, [f"Syntax Error ในโค้ด Python: {e}"]

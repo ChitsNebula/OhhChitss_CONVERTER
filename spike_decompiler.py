@@ -26,8 +26,13 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         # 1. Parse block code from the source llsp3 (Word Blocks)
         with zipfile.ZipFile(llsp3_path, "r") as z:
             sb3_data = z.read("scratch.sb3")
+            names = z.namelist()
+            orig_manifest_data = z.read("manifest.json") if "manifest.json" in names else None
+            orig_monitors_data = z.read("monitors.json") if "monitors.json" in names else None
+            orig_icon_data = z.read("icon.svg") if "icon.svg" in names else None
         
         with zipfile.ZipFile(io.BytesIO(sb3_data), "r") as sb3_zip:
+
             project = json.loads(sb3_zip.read("project.json"))
             
         target = project["targets"][1]
@@ -417,6 +422,17 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
             out_zip.writestr("projectbody.json", json.dumps(projectbody, indent=2))
             out_zip.writestr("icon.svg", icon_svg)
             
+            # Save original Word Blocks project files inside the python llsp3
+            if orig_manifest_data:
+                out_zip.writestr("orig_manifest.json", orig_manifest_data)
+            if orig_monitors_data:
+                out_zip.writestr("orig_monitors.json", orig_monitors_data)
+            if orig_icon_data:
+                out_zip.writestr("orig_icon.svg", orig_icon_data)
+            if sb3_data:
+                out_zip.writestr("orig_scratch.sb3", sb3_data)
+            
         return True, "OK"
+
     except Exception as e:
         return False, str(e)

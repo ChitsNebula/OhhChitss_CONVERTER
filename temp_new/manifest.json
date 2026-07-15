@@ -1,0 +1,20 @@
+{
+  "type": "word-blocks",
+  "autoDelete": false,
+  "created": "2026-07-15T15:03:44.843Z",
+  "id": "AyYMFelczLdI",
+  "lastsaved": "2026-07-15T15:03:44.843Z",
+  "size": 0,
+  "name": "aioon0012_python_blocks",
+  "slotIndex": 0,
+  "workspaceX": 120,
+  "workspaceY": 120,
+  "zoomLevel": 0.5,
+  "hardware": {},
+  "state": {
+    "playMode": "download",
+    "canvasDrawerOpen": false
+  },
+  "extraFiles": [],
+  "lastConnectedHubType": "flipper"
+}
