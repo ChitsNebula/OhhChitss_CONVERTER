@@ -34,7 +34,7 @@ MODES = {
 class ModernDecompilerGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("OhhChitss CONVERTER V1.0")
+        self.root.title("OhhChitss CONVERTER V1.1 (100% Fidelity)")
         self.root.geometry("520x460")
         self.root.configure(bg="#0C0D0E")
         self.root.resizable(False, False)
@@ -131,9 +131,10 @@ class ModernDecompilerGUI:
         self.convert_btn.place(x=40, y=364, width=440, height=42)
 
         # ── Footer ────────────────────────────────────────────────────────
-        tk.Label(self.root, text="OhhChitss CONVERTER V1.0",
+        tk.Label(self.root, text="OhhChitss CONVERTER V1.1 (100% Fidelity)",
                  font=("Consolas", 8), fg="#5A616A", bg="#0C0D0E"
                  ).place(x=0, y=430, width=520)
+
 
         # Scanner line
         self.scanner_line  = self.bg_canvas.create_line(0, -10, 520, -10, fill="#F3BD41", width=3)
