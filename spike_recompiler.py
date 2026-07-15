@@ -292,6 +292,8 @@ class Recompiler:
         if obj == "color_sensor" and method == "is_color":
             port  = args[0] if args else ast.Constant(value="A")
             color = args[1] if len(args) > 1 else ast.Constant(value="black")
+            if isinstance(color, ast.Constant) and color.value is None:
+                color = ast.Constant(value="None")
             self.add_block(bid, "flippersensors_isColor", parent_id=parent_id,
                            inputs={"PORT": self.port_input(port, bid, "flippersensors_color-sensor-selector"),
                                    "COLOR": self.port_input(color, bid, "flippersensors_color-selector")})
