@@ -805,8 +805,8 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
             "name": "costume1",
             "bitmapResolution": 1,
             "dataFormat": "svg",
-            "assetId": "bcf454acf82e4f56fde9aa9f62b73f66",
-            "md5ext": "bcf454acf82e4f56fde9aa9f62b73f66.svg",
+            "assetId": "d41d8cd98f00b204e9800998ecf8427e",
+            "md5ext": "d41d8cd98f00b204e9800998ecf8427e.svg",
             "rotationCenterX": 0,
             "rotationCenterY": 0
         }
@@ -851,15 +851,15 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
         sb3_buf = io.BytesIO()
         with zipfile.ZipFile(sb3_buf, "w", zipfile.ZIP_DEFLATED) as sb3_zip:
             sb3_zip.writestr("project.json", json.dumps(project))
+            sb3_zip.writestr("d41d8cd98f00b204e9800998ecf8427e.svg", "")
         sb3_bytes = sb3_buf.getvalue()
 
         # Manifest
         project_name = os.path.splitext(os.path.basename(output_llsp3_path))[0]
         now_str = datetime.datetime.utcnow().isoformat(timespec='milliseconds') + "Z"
-        pid = gen_id()
+        pid = gen_id(length=12)
         manifest = {
             "type": "word-blocks",
-            "appType": "llsp3",
             "autoDelete": False,
             "created": now_str,
             "id": pid,
@@ -870,10 +870,15 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
             "workspaceX": 120,
             "workspaceY": 120,
             "zoomLevel": 0.5,
-            "hardware": {"python": {"type": "flipper"}},
-            "state": {"canvasDrawerOpen": False},
-            "extraFiles": []
+            "hardware": {},
+            "state": {
+                "playMode": "download",
+                "canvasDrawerOpen": False
+            },
+            "extraFiles": [],
+            "lastConnectedHubType": "flipper"
         }
+
 
         icon_svg = ('<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg">'
                     '<rect width="60" height="60" rx="8" fill="#F3BD41"/>'
