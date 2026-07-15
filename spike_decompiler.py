@@ -253,8 +253,10 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     speed_arg = f", speed={get_in('SPEED')}" if "SPEED" in inputs else ""
                     lines.append(f"{indent_str}motor.go_to_relative_position({get_in('PORT')}, {get_in('POSITION')}{speed_arg})")
                 elif opcode == "flippermoremotor_motorSetStopMethod":
-                    stop_type = get_field("TYPE")
-                    lines.append(f"{indent_str}motor.set_stop_method({get_in('PORT')}, '{stop_type}')")
+                    stop_type = get_field("STOP")
+                    stop_map = {"0": "coast", "1": "brake", "2": "hold"}
+                    stop_label = stop_map.get(str(stop_type), stop_type)
+                    lines.append(f"{indent_str}motor.set_stop_method({get_in('PORT')}, '{stop_label}')")
                 elif opcode == "flippermoremotor_motorSetAcceleration":
                     lines.append(f"{indent_str}motor.set_acceleration({get_in('PORT')}, {get_in('ACCELERATION')})")
                 elif opcode == "flippermoremove_movementSetAcceleration":

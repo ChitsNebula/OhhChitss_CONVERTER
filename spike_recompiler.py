@@ -79,8 +79,11 @@ class Recompiler:
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             port_val = node.value
             shadow_id = gen_id(length=12)
+            field_name = f"field_{selector_type}"
+            if "menu_acceleration" in selector_type:
+                field_name = "acceleration"
             self.add_block(shadow_id, selector_type, parent_id=parent_id, fields={
-                f"field_{selector_type}": [port_val, None]
+                field_name: [port_val, None]
             }, shadow=True)
             return [1, shadow_id]
         return self.expr_to_input(node, parent_id)
@@ -599,7 +602,7 @@ class Recompiler:
 
         if obj == "movement" and method == "set_acceleration":
             self.add_block(bid, "flippermoremove_movementSetAcceleration", parent_id=parent_id,
-                           inputs={"ACCELERATION": self.expr_to_input(get_arg(0, 100), bid)})
+                           inputs={"ACCELERATION": self.port_input(get_arg(0, "3000 3000"), bid, "flippermoremove_menu_acceleration")})
             return [bid]
 
         # ── motor ─────────────────────────────────────────────────────────
@@ -650,11 +653,19 @@ class Recompiler:
         if obj == "motor" and method == "set_stop_method":
             stop_type = get_kwarg_str("type", "hold") if "type" in kwargs else (
                 args[1].value if len(args) > 1 and isinstance(args[1], ast.Constant) else "hold")
+            
+            stop_map = {
+                "coast": "0", "float": "0", "0": "0",
+                "brake": "1", "1": "1",
+                "hold": "2", "hold position": "2", "2": "2"
+            }
+            stop_code = stop_map.get(str(stop_type).lower(), "2")
+            
             port = get_arg(0, "A")
             sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorSetStopMethod", parent_id=parent_id,
                            inputs={"PORT": self.port_input(port, bid, sel_type)},
-                           fields={"TYPE": [stop_type, None]})
+                           fields={"STOP": [stop_code, None]})
             return [bid]
 
         if obj == "motor" and method == "set_acceleration":
@@ -662,7 +673,7 @@ class Recompiler:
             sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorSetAcceleration", parent_id=parent_id,
                            inputs={"PORT":         self.port_input(port, bid, sel_type),
-                                   "ACCELERATION": self.expr_to_input(get_arg(1, 100), bid)})
+                                   "ACCELERATION": self.port_input(get_arg(1, "1000 1000"), bid, "flippermoremotor_menu_acceleration")})
             return [bid]
 
         if obj == "motor" and method == "set_speed":
