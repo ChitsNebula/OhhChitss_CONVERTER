@@ -85,6 +85,17 @@ class Recompiler:
             return [1, shadow_id]
         return self.expr_to_input(node, parent_id)
 
+    def direction_input(self, node, parent_id, shadow_opcode):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            dir_val = node.value
+            shadow_id = gen_id(length=12)
+            self.add_block(shadow_id, shadow_opcode, parent_id=parent_id, fields={
+                f"field_{shadow_opcode}": [dir_val, None]
+            }, shadow=True)
+            return [1, shadow_id]
+        return self.expr_to_input(node, parent_id)
+
+
 
 
     def block_input(self, bid):
@@ -554,8 +565,7 @@ class Recompiler:
             unit = get_kwarg_str("unit", "cm")
             self.add_block(bid, "flippermove_move", parent_id=parent_id,
                            inputs={"VALUE":     self.expr_to_input(get_arg(0), bid),
-                                   "DIRECTION": self.expr_to_input(get_kwarg("direction",
-                                                                              "forward"), bid)},
+                                   "DIRECTION": self.direction_input(get_kwarg("direction", "forward"), bid, "flippermove_custom-icon-direction")},
                            fields={"UNIT": [unit, None]})
             return [bid]
 
@@ -599,7 +609,7 @@ class Recompiler:
             sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermotor_motorTurnForDirection", parent_id=parent_id,
                            inputs={"PORT":      self.port_input(port, bid, sel_type),
-                                   "DIRECTION": self.expr_to_input(get_arg(1, "clockwise"), bid),
+                                   "DIRECTION": self.direction_input(get_arg(1, "clockwise"), bid, "flippermotor_custom-icon-direction"),
                                    "VALUE":     self.expr_to_input(get_arg(2, 0), bid)},
                            fields={"UNIT": [unit, None]})
             return [bid]
