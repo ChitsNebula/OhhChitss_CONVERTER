@@ -14,6 +14,18 @@ def gen_id(length=12):
     return "".join(random.choice(chars) for _ in range(length))
 
 
+def clean_identifier(name):
+    if not name:
+        return "var"
+    cleaned = re.sub(r'[^a-zA-Z0-9_\u0e00-\u0e7f]', '_', name)
+    if cleaned[0].isdigit():
+        cleaned = "_" + cleaned
+    if cleaned in ("def", "class", "if", "else", "elif", "while", "for", "in", "import", "from", "return", "pass", "and", "or", "not", "is"):
+        cleaned = cleaned + "_"
+    return cleaned
+
+
+
 class Recompiler:
     def __init__(self):
         self.blocks = {}
@@ -60,6 +72,17 @@ class Recompiler:
         if name in self.list_names:
             return [3, [13, name, vid], [10, ""]]
         return [3, [12, name, vid], [10, ""]]
+
+    def port_input(self, node, parent_id, selector_type):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            port_val = node.value
+            shadow_id = gen_id(length=12)
+            self.add_block(shadow_id, selector_type, parent_id=parent_id, fields={
+                f"field_{selector_type}": [port_val, None]
+            }, shadow=True)
+            return [1, shadow_id]
+        return self.expr_to_input(node, parent_id)
+
 
 
     def block_input(self, bid):
@@ -134,7 +157,6 @@ class Recompiler:
                     })
                     return bid
 
-
                 op_map = {
                     ast.Eq:  "operator_equals",
                     ast.Gt:  "operator_gt",
@@ -142,6 +164,22 @@ class Recompiler:
                     ast.GtE: "operator_gt",
                     ast.LtE: "operator_lt",
                 }
+
+                # Check for flippersensors_isReflectivity shortcut
+                # color_sensor.reflectivity(port) <cmp> value
+                if isinstance(node.left, ast.Call) and type(op) in op_map:
+                    obj, method, c_args, _ = self._call_parts(node.left)
+                    if obj == "color_sensor" and method == "reflectivity":
+                        port = c_args[0] if c_args else ast.Constant(value="A")
+                        comp_str = "=" if type(op) == ast.Eq else (">" if type(op) in (ast.Gt, ast.GtE) else "<")
+                        self.add_block(bid, "flippersensors_isReflectivity", parent_id=parent_id, inputs={
+                            "PORT": self.port_input(port, bid, "flippersensors_color-sensor-selector"),
+                            "VALUE": self.expr_to_input(cmp, bid),
+                        }, fields={
+                            "COMPARATOR": [comp_str, None]
+                        })
+                        return bid
+
                 opcode = op_map.get(type(op))
                 if opcode:
                     self.add_block(bid, opcode, parent_id=parent_id, inputs={
@@ -151,6 +189,7 @@ class Recompiler:
                     return bid
             self.warnings.append("Unsupported comparison type")
             return None
+
 
 
         # Boolean ops
@@ -211,48 +250,61 @@ class Recompiler:
             return bid
 
         if obj == "color_sensor" and method == "color":
-            port = args[0] if args else ast.Constant(value="C")
-            self.add_block(bid, "flippersensors_color", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid)})
+            port = args[0] if args else None
+            inputs = {}
+            if port:
+                inputs["PORT"] = self.port_input(port, bid, "flippersensors_color-sensor-selector")
+            self.add_block(bid, "flippersensors_color", parent_id=parent_id, inputs=inputs)
             return bid
 
         if obj == "color_sensor" and method == "reflectivity":
             port = args[0] if args else ast.Constant(value="A")
             self.add_block(bid, "flippersensors_reflectivity", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid)})
+                           inputs={"PORT": self.port_input(port, bid, "flippersensors_color-sensor-selector")})
             return bid
 
         if obj == "color_sensor" and method == "is_color":
             port  = args[0] if args else ast.Constant(value="A")
             color = args[1] if len(args) > 1 else ast.Constant(value="black")
             self.add_block(bid, "flippersensors_isColor", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid),
-                                   "COLOR": self.expr_to_input(color, bid)})
+                           inputs={"PORT": self.port_input(port, bid, "flippersensors_color-sensor-selector"),
+                                   "COLOR": self.port_input(color, bid, "flippersensors_color-selector")})
             return bid
 
         if obj == "distance_sensor" and method == "get_distance_percentage":
             port = args[0] if args else ast.Constant(value="A")
             self.add_block(bid, "flippersensors_distance", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid)})
+                           inputs={"PORT": self.port_input(port, bid, "flippersensors_distance-sensor-selector")})
             return bid
 
         if obj == "force_sensor" and method == "get_force_newton":
             port = args[0] if args else ast.Constant(value="A")
             self.add_block(bid, "flippersensors_force", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid)})
+                           inputs={"PORT": self.port_input(port, bid, "flippersensors_force-sensor-selector")})
+            return bid
+
+        if obj == "force_sensor" and method == "is_pressed":
+            port = args[0] if args else ast.Constant(value="F")
+            opt_val = args[1].value if len(args) > 1 and isinstance(args[1], ast.Constant) else "pressed"
+            self.add_block(bid, "flippersensors_isPressed", parent_id=parent_id,
+                           inputs={"PORT": self.port_input(port, bid, "flippersensors_force-sensor-selector")},
+                           fields={"OPTION": [opt_val, None]})
             return bid
 
         if obj == "motor" and method == "position":
             port = args[0] if args else ast.Constant(value="A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_position", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid)})
+                           inputs={"PORT": self.port_input(port, bid, sel_type)})
             return bid
 
         if obj == "motor" and method == "degrees_counted":
             port = args[0] if args else ast.Constant(value="A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_degrees", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(port, bid)})
+                           inputs={"PORT": self.port_input(port, bid, sel_type)})
             return bid
+
 
         if obj == "math":
             num = args[0] if args else ast.Constant(value=0)
@@ -332,10 +384,16 @@ class Recompiler:
         if isinstance(node, ast.AugAssign) and isinstance(node.target, ast.Name):
             var_name = node.target.id
             vid = self.add_var(var_name)
+            bid = gen_id()
+            if isinstance(node.op, ast.Add):
+                self.add_block(bid, "data_changevariableby", parent_id=parent_id,
+                               inputs={"VALUE": self.expr_to_input(node.value, bid)},
+                               fields={"VARIABLE": [var_name, vid]})
+                return [bid]
+
             op_map = {ast.Add: "operator_add", ast.Sub: "operator_subtract",
                       ast.Mult: "operator_multiply", ast.Div: "operator_divide"}
             opcode = op_map.get(type(node.op), "operator_add")
-            bid = gen_id()
             binop_bid = gen_id()
             self.add_block(binop_bid, opcode, parent_id=bid,
                            inputs={"NUM1": self.var_input(var_name),
@@ -344,6 +402,7 @@ class Recompiler:
                            inputs={"VALUE": [3, binop_bid, [4, "0"]]},
                            fields={"VARIABLE": [var_name, vid]})
             return [bid]
+
 
         # Expression statement (function call)
         if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
@@ -383,6 +442,28 @@ class Recompiler:
 
         # While loop
         if isinstance(node, ast.While):
+            # check if it is a "wait until" pattern:
+            # while not X: time.sleep(0.01)
+            is_wait_until = False
+            test = node.test
+            if isinstance(test, ast.UnaryOp) and isinstance(test.op, ast.Not):
+                if len(node.body) == 1:
+                    stmt = node.body[0]
+                    if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+                        obj, method, _, _ = self._call_parts(stmt.value)
+                        if obj == "time" and method == "sleep":
+                            is_wait_until = True
+
+            if is_wait_until:
+                bid = gen_id()
+                cond_bid = self.compile_expr(test.operand, bid)
+                cond_input = self.block_input(cond_bid) if cond_bid else self.lit_input(True)
+                self.add_block(bid, "control_wait_until", parent_id=parent_id,
+                               inputs={"CONDITION": cond_input})
+                if cond_bid:
+                    self.blocks[cond_bid]["parent"] = bid
+                return [bid]
+
             # while True → forever
             if isinstance(node.test, ast.Constant) and node.test.value is True:
                 bid = gen_id()
@@ -410,6 +491,7 @@ class Recompiler:
             if body_ids:
                 self.blocks[bid]["inputs"]["SUBSTACK"] = [2, body_ids[0]]
             return [bid]
+
 
         # For loop (simple range)
         if isinstance(node, ast.For):
@@ -484,7 +566,7 @@ class Recompiler:
 
         if obj == "movement" and method == "pair":
             self.add_block(bid, "flippermove_setMovementPair", parent_id=parent_id,
-                           inputs={"PAIR": self.expr_to_input(get_arg(0, "CD"), bid)})
+                           inputs={"PAIR": self.port_input(get_arg(0, "CD"), bid, "flippermove_movement-port-selector")})
             return [bid]
 
         if obj == "movement" and method == "start_dual_speed":
@@ -493,32 +575,45 @@ class Recompiler:
                                    "RIGHT": self.expr_to_input(get_arg(1, 50), bid)})
             return [bid]
 
+        if obj == "movement" and method == "set_acceleration":
+            self.add_block(bid, "flippermoremove_movementSetAcceleration", parent_id=parent_id,
+                           inputs={"ACCELERATION": self.expr_to_input(get_arg(0, 100), bid)})
+            return [bid]
+
         # ── motor ─────────────────────────────────────────────────────────
         if obj == "motor" and method == "turn":
             unit = get_kwarg_str("unit", "degrees")
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermotor_motorTurnForDirection", parent_id=parent_id,
-                           inputs={"PORT":      self.expr_to_input(get_arg(0, "A"), bid),
+                           inputs={"PORT":      self.port_input(port, bid, sel_type),
                                    "DIRECTION": self.expr_to_input(get_arg(1, "clockwise"), bid),
                                    "VALUE":     self.expr_to_input(get_arg(2, 0), bid)},
                            fields={"UNIT": [unit, None]})
             return [bid]
 
         if obj == "motor" and method == "start_power":
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorStartPower", parent_id=parent_id,
-                           inputs={"PORT":  self.expr_to_input(get_arg(0, "A"), bid),
+                           inputs={"PORT":  self.port_input(port, bid, sel_type),
                                    "POWER": self.expr_to_input(get_arg(1, 50), bid)})
             return [bid]
 
         if obj == "motor" and method == "set_degrees_counted":
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorSetDegreeCounted", parent_id=parent_id,
-                           inputs={"PORT":  self.expr_to_input(get_arg(0, "A"), bid),
+                           inputs={"PORT":  self.port_input(port, bid, sel_type),
                                    "VALUE": self.expr_to_input(get_arg(1, 0), bid)})
             return [bid]
 
         if obj == "motor" and method == "go_to_relative_position":
             dir_val = get_kwarg_str("direction", "shortest path")
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             inputs = {
-                "PORT":     self.expr_to_input(get_arg(0, "A"), bid),
+                "PORT":     self.port_input(port, bid, sel_type),
                 "POSITION": self.expr_to_input(get_arg(1, 0), bid)
             }
             if "speed" in kwargs:
@@ -533,19 +628,30 @@ class Recompiler:
         if obj == "motor" and method == "set_stop_method":
             stop_type = get_kwarg_str("type", "hold") if "type" in kwargs else (
                 args[1].value if len(args) > 1 and isinstance(args[1], ast.Constant) else "hold")
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorSetStopMethod", parent_id=parent_id,
-                           inputs={"PORT": self.expr_to_input(get_arg(0, "A"), bid)},
+                           inputs={"PORT": self.port_input(port, bid, sel_type)},
                            fields={"TYPE": [stop_type, None]})
             return [bid]
 
         if obj == "motor" and method == "set_acceleration":
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorSetAcceleration", parent_id=parent_id,
-                           inputs={"PORT":         self.expr_to_input(get_arg(0, "A"), bid),
+                           inputs={"PORT":         self.port_input(port, bid, sel_type),
                                    "ACCELERATION": self.expr_to_input(get_arg(1, 100), bid)})
             return [bid]
 
+        if obj == "motor" and method == "set_speed":
+            port = get_arg(0, "A")
+            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
+            self.add_block(bid, "flippermotor_motorSetSpeed", parent_id=parent_id,
+                           inputs={"PORT":  self.port_input(port, bid, sel_type),
+                                   "SPEED": self.expr_to_input(get_arg(1, 75), bid)})
+            return [bid]
 
-        # ── time / sys ────────────────────────────────────────────────────
+        # ── time / sys / sensors ──────────────────────────────────────────
         if obj == "time" and method == "sleep":
             self.add_block(bid, "control_wait", parent_id=parent_id,
                            inputs={"DURATION": self.expr_to_input(get_arg(0, 1), bid)})
@@ -555,16 +661,33 @@ class Recompiler:
             self.add_block(bid, "flippercontrol_stop", parent_id=parent_id)
             return [bid]
 
+        if obj == "sensors" and method == "reset_timer":
+            self.add_block(bid, "flippersensors_resetTimer", parent_id=parent_id)
+            return [bid]
+
         # ── sound ─────────────────────────────────────────────────────────
         if obj == "sound" and method == "beep":
+            note_node = get_arg(0, 60)
+            if isinstance(note_node, ast.Constant):
+                note_val = str(note_node.value)
+                shadow_id = gen_id(length=12)
+                self.add_block(shadow_id, "flippersound_custom-piano", parent_id=bid, fields={
+                    "field_flippersound_custom-piano": [note_val, None]
+                }, shadow=True)
+                note_in = [1, shadow_id]
+            else:
+                note_in = self.expr_to_input(note_node, bid)
+
             self.add_block(bid, "flippersound_beepForTime", parent_id=parent_id,
-                           inputs={"NOTE":     self.expr_to_input(get_arg(0, 60), bid),
+                           inputs={"NOTE":     note_in,
                                    "DURATION": self.expr_to_input(get_arg(1, 0.2), bid)})
             return [bid]
 
         if obj == "sound" and method == "volume":
             self.add_block(bid, "sound_setvolumeto", parent_id=parent_id,
                            inputs={"VOLUME": self.expr_to_input(get_arg(0, 100), bid)})
+            return [bid]
+
             return [bid]
 
         # ── sensors ───────────────────────────────────────────────────────
@@ -671,8 +794,35 @@ class Recompiler:
 
     # ─── main compile ────────────────────────────────────────────────────────
 
-    def compile(self, python_code):
+    def compile(self, python_code, orig_proj=None):
         tree = ast.parse(python_code)
+
+        # Extract original coordinates if available
+        orig_coords = {}
+        orig_main_coords = (100, 100)
+        if orig_proj:
+            try:
+                # Find all definitions and prototypes
+                blocks_dict = orig_proj["targets"][1]["blocks"]
+                for bid, b in blocks_dict.items():
+                    if isinstance(b, dict) and b.get("opcode") == "procedures_definition":
+                        x = b.get("x", 100)
+                        y = b.get("y", 100)
+                        custom_block_id = b["inputs"]["custom_block"][1]
+                        proto_block = blocks_dict.get(custom_block_id)
+                        if proto_block:
+                            proccode = proto_block["mutation"]["proccode"]
+                            import re, unicodedata
+                            clean_name = clean_identifier(re.sub(r'%[snb]', '', proccode).strip())
+                            clean_name_norm = unicodedata.normalize('NFKC', clean_name)
+                            orig_coords[clean_name_norm] = (x, y)
+                    elif isinstance(b, dict) and b.get("opcode") == "flipperevents_whenProgramStarts" and b.get("topLevel"):
+                        orig_main_coords = (b.get("x", 100), b.get("y", 100))
+            except Exception:
+                pass
+
+        self.orig_coords = orig_coords
+        self.orig_main_coords = orig_main_coords
 
         # Pass 1: collect procedure signatures
         for node in tree.body:
@@ -717,8 +867,8 @@ class Recompiler:
                             if isinstance(cmp, ast.Name):
                                 self.list_names.add(cmp.id)
 
-
         x_off, y_off = 100, 100
+
 
         # Compile function definitions
         for node in tree.body:
@@ -762,14 +912,19 @@ class Recompiler:
                 }
             }
 
+            import unicodedata
+            func_name_norm = unicodedata.normalize('NFKC', func_name)
+            px, py = self.orig_coords.get(func_name_norm, (x_off, y_off))
             self.blocks[def_bid] = {
                 "opcode": "procedures_definition",
                 "next": None, "parent": None,
                 "inputs": {"custom_block": [1, proto_bid]},
                 "fields": {}, "shadow": False, "topLevel": True,
-                "x": x_off, "y": y_off,
+                "x": px, "y": py,
             }
-            y_off += 350
+            if func_name_norm not in self.orig_coords:
+                y_off += 350
+
 
             body_nodes = [n for n in node.body
                           if not isinstance(n, (ast.Global, ast.Return))]
@@ -780,12 +935,13 @@ class Recompiler:
 
         # Compile main / top-level
         main_found = False
+        main_x, main_y = self.orig_main_coords
         for node in tree.body:
             if isinstance(node, ast.FunctionDef) and node.name == "main":
                 main_found = True
                 ev_bid = gen_id()
                 self.add_block(ev_bid, "flipperevents_whenProgramStarts",
-                               top_level=True, x=x_off, y=y_off)
+                               top_level=True, x=main_x, y=main_y)
                 body_nodes = [n for n in node.body
                               if not isinstance(n, (ast.Global, ast.Return))]
                 body_ids = self.compile_body(body_nodes, ev_bid)
@@ -801,11 +957,12 @@ class Recompiler:
             if top_stmts:
                 ev_bid = gen_id()
                 self.add_block(ev_bid, "flipperevents_whenProgramStarts",
-                               top_level=True, x=x_off, y=y_off)
+                               top_level=True, x=main_x, y=main_y)
                 body_ids = self.compile_body(top_stmts, ev_bid)
                 if body_ids:
                     self.blocks[ev_bid]["next"] = body_ids[0]
                     self.blocks[body_ids[0]]["parent"] = ev_bid
+
 
         return self.blocks, self.variables, self.warnings
 
@@ -837,18 +994,6 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
             if "orig_scratch.sb3" in names:
                 orig_scratch_bytes = z.read("orig_scratch.sb3")
 
-        rc = Recompiler()
-        blocks, variables, warnings = rc.compile(python_code)
-
-        # Build Scratch project.json
-        var_entries = {}
-        list_entries = {}
-        for name, vid in variables.items():
-            if name in rc.list_names:
-                list_entries[vid] = [name, []]
-            else:
-                var_entries[vid] = [name, 0]
-
         # Use original project.json as base if available
         orig_proj = None
         other_sb3_files = {}
@@ -862,6 +1007,19 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
                             other_sb3_files[sname] = s.read(sname)
             except Exception:
                 pass
+
+        rc = Recompiler()
+        blocks, variables, warnings = rc.compile(python_code, orig_proj=orig_proj)
+
+        # Build Scratch project.json
+        var_entries = {}
+        list_entries = {}
+        for name, vid in variables.items():
+            if name in rc.list_names:
+                list_entries[vid] = [name, []]
+            else:
+                var_entries[vid] = [name, 0]
+
 
         if orig_proj:
             project = orig_proj

@@ -170,6 +170,10 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 return f"distance_sensor.get_distance_percentage({get_in('PORT')})"
             elif opcode == "flippersensors_force":
                 return f"force_sensor.get_force_newton({get_in('PORT')})"
+            elif opcode == "flippersensors_isPressed":
+                opt = get_field("OPTION", "pressed")
+                return f"force_sensor.is_pressed({get_in('PORT')}, '{opt}')"
+
             elif opcode == "flippersensors_orientationAxis":
                 axis = get_field("AXIS")
                 return f"hub.motion.orientation('{axis}')"
@@ -220,6 +224,11 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     var_id = fields["VARIABLE"][1]
                     var_name = var_map.get(var_id, clean_identifier(fields["VARIABLE"][0]))
                     lines.append(f"{indent_str}{var_name} = {get_in('VALUE')}")
+                elif opcode == "data_changevariableby":
+                    var_id = fields["VARIABLE"][1]
+                    var_name = var_map.get(var_id, clean_identifier(fields["VARIABLE"][0]))
+                    lines.append(f"{indent_str}{var_name} += {get_in('VALUE')}")
+
                 elif opcode == "flippermove_setMovementPair":
                     lines.append(f"{indent_str}movement.pair({get_in('PAIR')})")
                 elif opcode == "flippermove_movementSpeed":
@@ -248,8 +257,15 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     lines.append(f"{indent_str}motor.set_stop_method({get_in('PORT')}, '{stop_type}')")
                 elif opcode == "flippermoremotor_motorSetAcceleration":
                     lines.append(f"{indent_str}motor.set_acceleration({get_in('PORT')}, {get_in('ACCELERATION')})")
+                elif opcode == "flippermoremove_movementSetAcceleration":
+                    lines.append(f"{indent_str}movement.set_acceleration({get_in('ACCELERATION')})")
+                elif opcode == "flippermotor_motorSetSpeed":
+                    lines.append(f"{indent_str}motor.set_speed({get_in('PORT')}, {get_in('SPEED')})")
+                elif opcode == "flippersensors_resetTimer":
+                    lines.append(f"{indent_str}sensors.reset_timer()")
                 elif opcode == "flippermoremotor_menu_acceleration":
                     pass  # shadow menu block, consumed by parent
+
                 elif opcode == "flippersound_beepForTime":
                     lines.append(f"{indent_str}sound.beep({get_in('NOTE')}, {get_in('DURATION')})")
                 elif opcode == "sound_setvolumeto":
