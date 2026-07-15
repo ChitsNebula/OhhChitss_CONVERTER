@@ -96,9 +96,23 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     return fields[name][0]
                 return default
 
+            # Menu/selector/custom shadow blocks → return their field value directly
             field_key = "field_" + opcode
             if field_key in fields:
                 return f"'{fields[field_key][0]}'"
+            # acceleration menu: field key is 'acceleration'
+            if "menu_acceleration" in opcode and "acceleration" in fields:
+                return f"'{fields['acceleration'][0]}'"
+            # rotation-wheel, custom-piano, colour menus etc.
+            # Only apply single-field shortcut to shadow menu/selector blocks
+            _MENU_KEYWORDS = ("menu", "selector", "custom-icon", "custom-piano",
+                               "rotation-wheel", "color-selector", "colour")
+            if (fields and len(fields) == 1 and
+                    any(kw in opcode for kw in _MENU_KEYWORDS)):
+                only_val = list(fields.values())[0]
+                if only_val and only_val[0] is not None:
+                    return f"'{only_val[0]}'"
+
 
             if opcode == "operator_add":
                 return f"({get_in('NUM1')} + {get_in('NUM2')})"
@@ -116,20 +130,52 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 return f"({get_in('OPERAND1')} < {get_in('OPERAND2')})"
             elif opcode == "operator_not":
                 return f"(not {get_in('OPERAND')})"
+            elif opcode == "operator_and":
+                return f"({get_in('OPERAND1')} and {get_in('OPERAND2')})"
+            elif opcode == "operator_or":
+                return f"({get_in('OPERAND1')} or {get_in('OPERAND2')})"
+            elif opcode == "operator_contains":
+                return f"({get_in('ITEM')} in {get_in('STRING')})"
             elif opcode == "operator_mathop":
                 op = get_field("OPERATOR")
+                # abs is a Python built-in, not math.abs
+                if op == "abs":
+                    return f"abs({get_in('NUM')})"
                 return f"math.{op}({get_in('NUM')})"
             elif opcode == "flipperoperator_isInBetween":
                 return f"({get_in('LOWER')} <= {get_in('VALUE')} <= {get_in('UPPER')})"
             elif opcode == "flippersensors_reflectivity":
                 return f"color_sensor.reflectivity({get_in('PORT')})"
+            elif opcode == "flippersensors_isReflectivity":
+                cmp = get_field("COMPARATOR", "<")
+                return f"(color_sensor.reflectivity({get_in('PORT')}) {cmp} {get_in('VALUE')})"
             elif opcode == "flippersensors_isColor":
                 return f"color_sensor.is_color({get_in('PORT')}, {get_in('COLOR')})"
+            elif opcode == "flippersensors_color":
+                # detect color reporter (no port input — uses current color sensor)
+                port = get_in('PORT', None)
+                if port and port != 'None':
+                    return f"color_sensor.color({port})"
+                return "color_sensor.color()"
+            elif opcode == "flippersensors_distance":
+                return f"distance_sensor.get_distance_percentage({get_in('PORT')})"
+            elif opcode == "flippersensors_force":
+                return f"force_sensor.get_force_newton({get_in('PORT')})"
             elif opcode == "flippersensors_orientationAxis":
                 axis = get_field("AXIS")
                 return f"hub.motion.orientation('{axis}')"
+            elif opcode == "flippersensors_tiltAngle":
+                axis = get_field("AXIS", "pitch")
+                return f"hub.motion.tilt_angles()[0]"
+            elif opcode == "flippersensors_timer":
+                return "time.time()"
+            elif opcode == "flippersensors_resetTimer":
+                return "0"  # timer reset has no Python equivalent
             elif opcode == "flippermoremotor_position":
                 return f"motor.position({get_in('PORT')})"
+            elif opcode == "flippermoremotor_degrees":
+                return f"motor.degrees_counted({get_in('PORT')})"
+
             elif opcode == "procedures_call":
                 proc_code = b["mutation"]["proccode"]
                 arg_ids = json.loads(b["mutation"]["argumentids"])
@@ -139,7 +185,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 clean_name = clean_identifier(re.sub(r'%[snb]', '', proc_code).strip())
                 return f"{clean_name}({', '.join(args)})"
             else:
-                return f"[{opcode}]"
+                return f"False  # unsupported expr: {opcode}"
 
         def decompile_chain(start_id, indent=0):
             lines = []
@@ -178,19 +224,23 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 elif opcode == "flippermotor_motorTurnForDirection":
                     lines.append(f"{indent_str}motor.turn({get_in('PORT')}, {get_in('DIRECTION')}, {get_in('VALUE')}, unit='{get_field('UNIT')}')")
                 elif opcode == "flippermoremove_startDualSpeed":
-                    lines.append(f"{indent_str}movement.start_dual_speed({get_in('SPEED_L')}, {get_in('SPEED_R')})")
+                    lines.append(f"{indent_str}movement.start_dual_speed({get_in('LEFT')}, {get_in('RIGHT')})")
+                elif opcode == "flippermoremotor_motorStartPower":
+                    lines.append(f"{indent_str}motor.start_power({get_in('PORT')}, {get_in('POWER')})")
                 elif opcode == "flippersensors_resetYaw":
                     lines.append(f"{indent_str}sensors.reset_yaw()")
                 elif opcode == "flippermoremotor_motorSetDegreeCounted":
                     lines.append(f"{indent_str}motor.set_degrees_counted({get_in('PORT')}, {get_in('VALUE')})")
                 elif opcode == "flippermoremotor_motorGoToRelativePosition":
-                    lines.append(f"{indent_str}motor.go_to_relative_position({get_in('PORT')}, {get_in('POSITION')}, direction='{get_field('DIRECTION')}')")
+                    speed_arg = f", speed={get_in('SPEED')}" if "SPEED" in inputs else ""
+                    lines.append(f"{indent_str}motor.go_to_relative_position({get_in('PORT')}, {get_in('POSITION')}{speed_arg})")
                 elif opcode == "flippermoremotor_motorSetStopMethod":
-                    lines.append(f"{indent_str}motor.set_stop_method({get_in('PORT')}, '{get_field('TYPE')}')")
+                    stop_type = get_field("TYPE")
+                    lines.append(f"{indent_str}motor.set_stop_method({get_in('PORT')}, '{stop_type}')")
                 elif opcode == "flippermoremotor_motorSetAcceleration":
                     lines.append(f"{indent_str}motor.set_acceleration({get_in('PORT')}, {get_in('ACCELERATION')})")
                 elif opcode == "flippermoremotor_menu_acceleration":
-                    pass
+                    pass  # shadow menu block, consumed by parent
                 elif opcode == "flippersound_beepForTime":
                     lines.append(f"{indent_str}sound.beep({get_in('NOTE')}, {get_in('DURATION')})")
                 elif opcode == "sound_setvolumeto":
@@ -201,10 +251,25 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     lines.append(f"{indent_str}time.sleep({get_in('DURATION')})")
                 elif opcode == "control_wait_until":
                     lines.append(f"{indent_str}# Wait until\n{indent_str}while not {get_in('CONDITION')}:\n{indent_str}    time.sleep(0.01)")
+                elif opcode == "control_forever":
+                    substack = inputs.get("SUBSTACK", [None, None])[1]
+                    lines.append(f"{indent_str}while True:")
+                    if substack:
+                        lines.append(decompile_chain(substack, indent + 1))
+                    else:
+                        lines.append(f"{indent_str}    pass")
                 elif opcode == "control_repeat_until":
                     cond = get_in("CONDITION")
                     substack = inputs.get("SUBSTACK", [None, None])[1]
                     lines.append(f"{indent_str}while not {cond}:")
+                    if substack:
+                        lines.append(decompile_chain(substack, indent + 1))
+                    else:
+                        lines.append(f"{indent_str}    pass")
+                elif opcode == "control_repeat":
+                    times = get_in("TIMES")
+                    substack = inputs.get("SUBSTACK", [None, None])[1]
+                    lines.append(f"{indent_str}for _ in range(int({times})):")
                     if substack:
                         lines.append(decompile_chain(substack, indent + 1))
                     else:
@@ -214,9 +279,15 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     substack = inputs.get("SUBSTACK", [None, None])[1]
                     lines.append(f"{indent_str}if {cond}:")
                     if substack:
-                        lines.append(decompile_chain(substack, indent + 1))
+                        body = decompile_chain(substack, indent + 1)
+                        lines.append(body)
+                        # If body contains ONLY comments, add pass to keep syntax valid
+                        body_lines = [l.strip() for l in body.split('\n') if l.strip()]
+                        if all(l.startswith('#') for l in body_lines):
+                            lines.append(f"{indent_str}    pass")
                     else:
                         lines.append(f"{indent_str}    pass")
+
                 elif opcode == "control_if_else":
                     cond = get_in("CONDITION")
                     substack = inputs.get("SUBSTACK", [None, None])[1]
@@ -231,10 +302,17 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                         lines.append(decompile_chain(substack2, indent + 1))
                     else:
                         lines.append(f"{indent_str}    pass")
+                elif opcode == "flippersensors_resetTimer":
+                    pass  # reset timer — no Python equivalent, skip
+                elif opcode == "flippersensors_isReflectivity":
+                    # inline reflectivity comparison — output as comment + pass
+                    lines.append(f"{indent_str}# flippersensors_isReflectivity (unsupported — skipped)")
+                    lines.append(f"{indent_str}pass")
                 elif opcode == "procedures_call":
                     lines.append(f"{indent_str}{decompile_block(curr_id)}")
                 else:
                     lines.append(f"{indent_str}# Unsupported Statement Opcode: {opcode}")
+                    lines.append(f"{indent_str}pass")
                 curr_id = b.get("next")
             return "\n".join(lines)
 

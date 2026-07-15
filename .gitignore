@@ -8,3 +8,5 @@ files/
 lessons.db
 lessons.json
 scrape_primelessons.py
+_test_*
+_test_out.llsp3
