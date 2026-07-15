@@ -57,7 +57,10 @@ class Recompiler:
 
     def var_input(self, name):
         vid = self.add_var(name)
+        if name in self.list_names:
+            return [3, [13, name, vid], [10, ""]]
         return [3, [12, name, vid], [10, ""]]
+
 
     def block_input(self, bid):
         return [2, bid]
