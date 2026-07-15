@@ -797,8 +797,9 @@ class Recompiler:
     def compile(self, python_code, orig_proj=None):
         tree = ast.parse(python_code)
 
-        # Extract original coordinates if available
+        # Extract original coordinates and proccodes if available
         orig_coords = {}
+        orig_proccodes = {}
         orig_main_coords = (100, 100)
         if orig_proj:
             try:
@@ -816,6 +817,7 @@ class Recompiler:
                             clean_name = clean_identifier(re.sub(r'%[snb]', '', proccode).strip())
                             clean_name_norm = unicodedata.normalize('NFKC', clean_name)
                             orig_coords[clean_name_norm] = (x, y)
+                            orig_proccodes[clean_name_norm] = proccode
                     elif isinstance(b, dict) and b.get("opcode") == "flipperevents_whenProgramStarts" and b.get("topLevel"):
                         orig_main_coords = (b.get("x", 100), b.get("y", 100))
             except Exception:
@@ -829,13 +831,22 @@ class Recompiler:
             if isinstance(node, ast.FunctionDef) and node.name != "main":
                 arg_names = [a.arg for a in node.args.args]
                 arg_ids   = [gen_id() for _ in arg_names]
-                proccode  = (node.name + " " +
-                             " ".join("%s" for _ in arg_names)).strip()
+
+                # Check if we have the original proccode
+                import unicodedata
+                node_name_norm = unicodedata.normalize('NFKC', node.name)
+                if node_name_norm in orig_proccodes:
+                    proccode = orig_proccodes[node_name_norm]
+                else:
+                    proccode  = (node.name + " " +
+                                 " ".join("%s" for _ in arg_names)).strip()
+
                 self.procedures[node.name] = {
                     "arg_ids":   arg_ids,
                     "arg_names": arg_names,
                     "proccode":  proccode,
                 }
+
 
         # Pass 2: collect top-level variables and detect list variables
         for node in ast.walk(tree):
