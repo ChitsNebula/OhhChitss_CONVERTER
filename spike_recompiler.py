@@ -33,6 +33,8 @@ class Recompiler:
         self.procedures = {}  # name -> {arg_ids, arg_names, proccode}
         self.warnings = []
         self.list_names = set()
+        self.curr_func = None
+
 
 
     # ─── helpers ────────────────────────────────────────────────────────────
@@ -100,6 +102,16 @@ class Recompiler:
         if isinstance(node, ast.Name):
             if node.id in ("True", "False"):
                 return self.lit_input(1 if node.id == "True" else 0)
+            
+            # Check if it is a parameter of the current function
+            if self.curr_func and node.id in self.procedures[self.curr_func]["arg_names"]:
+                idx = self.procedures[self.curr_func]["arg_names"].index(node.id)
+                disp_name = self.procedures[self.curr_func]["display_arg_names"][idx]
+                bid = gen_id()
+                self.add_block(bid, "argument_reporter_string_number", parent_id=parent_id,
+                               fields={"VALUE": [disp_name, None]}, shadow=False)
+                return [2, bid]
+                
             return self.var_input(node.id)
 
         if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
@@ -800,6 +812,7 @@ class Recompiler:
         # Extract original coordinates and proccodes if available
         orig_coords = {}
         orig_proccodes = {}
+        orig_params = {}
         orig_main_coords = (100, 100)
         if orig_proj:
             try:
@@ -818,6 +831,15 @@ class Recompiler:
                             clean_name_norm = unicodedata.normalize('NFKC', clean_name)
                             orig_coords[clean_name_norm] = (x, y)
                             orig_proccodes[clean_name_norm] = proccode
+                            try:
+                                arg_names_list = json.loads(proto_block["mutation"].get("argumentnames", "[]"))
+                                param_map = {}
+                                for arg in arg_names_list:
+                                    clean_arg = clean_identifier(arg)
+                                    param_map[clean_arg] = arg
+                                orig_params[clean_name_norm] = param_map
+                            except Exception:
+                                pass
                     elif isinstance(b, dict) and b.get("opcode") == "flipperevents_whenProgramStarts" and b.get("topLevel"):
                         orig_main_coords = (b.get("x", 100), b.get("y", 100))
             except Exception:
@@ -835,6 +857,11 @@ class Recompiler:
                 # Check if we have the original proccode
                 import unicodedata
                 node_name_norm = unicodedata.normalize('NFKC', node.name)
+
+                # Retrieve original parameter names if available
+                param_map = orig_params.get(node_name_norm, {})
+                display_arg_names = [param_map.get(name, name) for name in arg_names]
+
                 if node_name_norm in orig_proccodes:
                     proccode = orig_proccodes[node_name_norm]
                 else:
@@ -844,8 +871,10 @@ class Recompiler:
                 self.procedures[node.name] = {
                     "arg_ids":   arg_ids,
                     "arg_names": arg_names,
+                    "display_arg_names": display_arg_names,
                     "proccode":  proccode,
                 }
+
 
 
         # Pass 2: collect top-level variables and detect list variables
@@ -898,12 +927,13 @@ class Recompiler:
 
             # Argument reporter shadow blocks
             proto_inputs = {}
-            for arg_id, arg_name in zip(arg_ids, arg_names):
+            display_arg_names = proc_info.get("display_arg_names", arg_names)
+            for arg_id, clean_name, disp_name in zip(arg_ids, arg_names, display_arg_names):
                 rep_bid = gen_id()
                 self.blocks[rep_bid] = {
                     "opcode": "argument_reporter_string_number",
                     "next": None, "parent": proto_bid,
-                    "inputs": {}, "fields": {"VALUE": [arg_name, None]},
+                    "inputs": {}, "fields": {"VALUE": [disp_name, None]},
                     "shadow": True, "topLevel": False,
                 }
                 proto_inputs[arg_id] = [1, rep_bid]
@@ -917,8 +947,8 @@ class Recompiler:
                     "tagName": "mutation", "children": [],
                     "proccode": proccode,
                     "argumentids":      json.dumps(arg_ids),
-                    "argumentnames":    json.dumps(arg_names),
-                    "argumentdefaults": json.dumps(["" for _ in arg_names]),
+                    "argumentnames":    json.dumps(display_arg_names),
+                    "argumentdefaults": json.dumps(["" for _ in display_arg_names]),
                     "warp": "false",
                 }
             }
@@ -937,12 +967,14 @@ class Recompiler:
                 y_off += 350
 
 
+            self.curr_func = func_name
             body_nodes = [n for n in node.body
                           if not isinstance(n, (ast.Global, ast.Return))]
             body_ids = self.compile_body(body_nodes, def_bid)
             if body_ids:
                 self.blocks[def_bid]["next"] = body_ids[0]
                 self.blocks[body_ids[0]]["parent"] = def_bid
+            self.curr_func = None
 
         # Compile main / top-level
         main_found = False
