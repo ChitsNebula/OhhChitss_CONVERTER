@@ -20,6 +20,8 @@ class Recompiler:
         self.variables = {}   # name -> id
         self.procedures = {}  # name -> {arg_ids, arg_names, proccode}
         self.warnings = []
+        self.list_names = set()
+
 
     # ─── helpers ────────────────────────────────────────────────────────────
 
@@ -113,9 +115,9 @@ class Recompiler:
         if isinstance(node, ast.Compare):
             if len(node.ops) == 2 and isinstance(node.ops[0], (ast.LtE, ast.Lt)) and isinstance(node.ops[1], (ast.LtE, ast.Lt)):
                 self.add_block(bid, "flipperoperator_isInBetween", parent_id=parent_id, inputs={
-                    "LOWER": self.expr_to_input(node.left, bid),
+                    "LOW": self.expr_to_input(node.left, bid),
                     "VALUE": self.expr_to_input(node.comparators[0], bid),
-                    "UPPER": self.expr_to_input(node.comparators[1], bid),
+                    "HIGH": self.expr_to_input(node.comparators[1], bid),
                 })
                 return bid
 
@@ -124,10 +126,11 @@ class Recompiler:
                 cmp = node.comparators[0]
                 if isinstance(op, ast.In):
                     self.add_block(bid, "operator_contains", parent_id=parent_id, inputs={
-                        "ITEM": self.expr_to_input(node.left, bid),
-                        "STRING": self.expr_to_input(cmp, bid),
+                        "STRING1": self.expr_to_input(cmp, bid),
+                        "STRING2": self.expr_to_input(node.left, bid),
                     })
                     return bid
+
 
                 op_map = {
                     ast.Eq:  "operator_equals",
@@ -681,7 +684,7 @@ class Recompiler:
                     "proccode":  proccode,
                 }
 
-        # Pass 2: collect top-level variables
+        # Pass 2: collect top-level variables and detect list variables
         for node in ast.walk(tree):
             if isinstance(node, ast.Assign):
                 for t in node.targets:
@@ -689,6 +692,28 @@ class Recompiler:
                         self.add_var(t.id)
             elif isinstance(node, ast.AugAssign) and isinstance(node.target, ast.Name):
                 self.add_var(node.target.id)
+
+            # Detect lists:
+            # 1) Call on attribute: mylist.append, mylist.insert, pop, remove
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                if node.func.attr in ("append", "insert", "pop", "remove"):
+                    if isinstance(node.func.value, ast.Name):
+                        self.list_names.add(node.func.value.id)
+            # 2) Subscript access: mylist[i]
+            if isinstance(node, ast.Subscript) and isinstance(node.value, ast.Name):
+                self.list_names.add(node.value.id)
+            # 3) len(mylist)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "len":
+                if node.args and isinstance(node.args[0], ast.Name):
+                    self.list_names.add(node.args[0].id)
+            # 4) item in mylist
+            if isinstance(node, ast.Compare):
+                for op in node.ops:
+                    if isinstance(op, ast.In):
+                        for cmp in node.comparators:
+                            if isinstance(cmp, ast.Name):
+                                self.list_names.add(cmp.id)
+
 
         x_off, y_off = 100, 100
 
@@ -799,7 +824,13 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
         blocks, variables, warnings = rc.compile(python_code)
 
         # Build Scratch project.json
-        var_entries = {vid: [name, 0] for name, vid in variables.items()}
+        var_entries = {}
+        list_entries = {}
+        for name, vid in variables.items():
+            if name in rc.list_names:
+                list_entries[vid] = [name, []]
+            else:
+                var_entries[vid] = [name, 0]
 
         costume = {
             "name": "costume1",
@@ -827,13 +858,22 @@ def recompile_python_to_wordblocks(input_llsp3_path, output_llsp3_path):
                     "isStage": False,
                     "name": "Sprite1",
                     "variables": var_entries,
-                    "lists": {}, "broadcasts": {},
+                    "lists": list_entries,
+                    "broadcasts": {},
                     "blocks": blocks,
                     "comments": {}, "currentCostume": 0,
                     "costumes": [costume], "sounds": [],
-                    "volume": 100, "layerOrder": 1
+                    "volume": 100, "layerOrder": 1,
+                    "visible": True,
+                    "x": 0,
+                    "y": 0,
+                    "size": 100,
+                    "direction": 90,
+                    "draggable": False,
+                    "rotationStyle": "all around"
                 }
             ],
+
             "monitors": [],
             "extensions": [
                 "flippermove", "flippermotor", "flippermoremotor",

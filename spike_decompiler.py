@@ -36,6 +36,9 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         var_map = {}
         for var_id, var_info in target.get("variables", {}).items():
             var_map[var_id] = clean_identifier(var_info[0])
+        for list_id, list_info in target.get("lists", {}).items():
+            var_map[list_id] = clean_identifier(list_info[0])
+
             
         def resolve(val):
             if not val:
@@ -135,7 +138,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
             elif opcode == "operator_or":
                 return f"({get_in('OPERAND1')} or {get_in('OPERAND2')})"
             elif opcode == "operator_contains":
-                return f"({get_in('ITEM')} in {get_in('STRING')})"
+                return f"({get_in('STRING2')} in {get_in('STRING1')})"
             elif opcode == "operator_mathop":
                 op = get_field("OPERATOR")
                 # abs is a Python built-in, not math.abs
@@ -143,7 +146,8 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     return f"abs({get_in('NUM')})"
                 return f"math.{op}({get_in('NUM')})"
             elif opcode == "flipperoperator_isInBetween":
-                return f"({get_in('LOWER')} <= {get_in('VALUE')} <= {get_in('UPPER')})"
+                return f"({get_in('LOW')} <= {get_in('VALUE')} <= {get_in('HIGH')})"
+
             elif opcode == "flippersensors_reflectivity":
                 return f"color_sensor.reflectivity({get_in('PORT')})"
             elif opcode == "flippersensors_isReflectivity":
