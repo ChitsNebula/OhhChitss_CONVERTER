@@ -189,12 +189,12 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
             elif opcode == "flippersensors_orientationAxis":
                 axis = get_field("AXIS", "yaw").lower()
                 if axis == "yaw":
-                    return "hub.motion_sensor.get_yaw_angle()"
+                    return "_get_yaw()"
                 else:
                     idx = {"roll": 0, "pitch": 1}.get(axis, 0)
-                    return f"(hub.motion_sensor.tilt_angles()[{idx}] / 10)"
+                    return f"(hub.motion_sensor.tilt_angles()[{idx}] // 10)"
             elif opcode == "flippersensors_tiltAngle":
-                return "(hub.motion_sensor.tilt_angles()[0] / 10)"
+                return "(hub.motion_sensor.tilt_angles()[0] // 10)"
             elif opcode == "flippersensors_timer":
                 return "_timer()"
             elif opcode == "flippersensors_resetTimer":
@@ -279,7 +279,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     for p in s3_ports_list(get_in('PORT')):
                         lines.append(f"{indent_str}motor.run({p}, int({get_in('POWER')} * 10))")
                 elif opcode == "flippersensors_resetYaw":
-                    lines.append(f"{indent_str}hub.motion_sensor.reset_yaw(0)")
+                    lines.append(f"{indent_str}_reset_yaw()")
                 elif opcode == "flippermoremotor_motorSetDegreeCounted":
                     for p in s3_ports_list(get_in('PORT')):
                         lines.append(f"{indent_str}motor.reset_relative_position({p}, {get_in('VALUE')})")
@@ -400,6 +400,25 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         output.append("")
         output.append("def _timer():")
         output.append("    return time.ticks_diff(time.ticks_ms(), _timer_start) / 1000.0")
+        output.append("")
+        output.append("# Gyro / Motion sensor helpers for SPIKE 3.x")
+        output.append("def _get_yaw():")
+        output.append("    try:")
+        output.append("        return hub.motion_sensor.tilt_angles()[0] // 10")
+        output.append("    except Exception:")
+        output.append("        try:")
+        output.append("            return hub.motion_sensor.tilt_angles()[0]")
+        output.append("        except Exception:")
+        output.append("            return 0")
+        output.append("")
+        output.append("def _reset_yaw():")
+        output.append("    try:")
+        output.append("        hub.motion_sensor.reset_yaw(0)")
+        output.append("    except Exception:")
+        output.append("        try:")
+        output.append("            hub.motion_sensor.reset_yaw_angle(0)")
+        output.append("        except Exception:")
+        output.append("            pass")
         output.append("")
 
         global_vars = [clean_identifier(v[0]) for v in target.get("variables", {}).values()]
