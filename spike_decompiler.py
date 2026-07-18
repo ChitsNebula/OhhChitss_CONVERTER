@@ -256,13 +256,30 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     else:
                         lines.append(f"{indent_str}# movement.pair({get_in('PAIR')}) — update ports manually")
                 elif opcode == "flippermove_movementSpeed":
-                    lines.append(f"{indent_str}# movement.speed({get_in('SPEED')}) — set via motor_pair velocity directly")
+                    lines.append(f"{indent_str}_move_speed = int({get_in('SPEED')} * 10)")
                 elif opcode == "flippermove_move":
-                    lines.append(f"{indent_str}# movement.move({get_in('VALUE')}, unit='{get_field('UNIT')}') — convert to motor_pair.move_for_degrees")
+                    direction = str(get_in("DIRECTION")).strip().strip("'\"").lower()
+                    val = get_in("VALUE")
+                    unit = get_field("UNIT", "rotations")
+                    sign = "-" if "back" in direction or "reverse" in direction else ""
+                    if unit == "seconds":
+                        lines.append(f"{indent_str}motor_pair.move_for_time(motor_pair.PAIR_1, int({val} * 1000), steering=0, velocity={sign}_move_speed)")
+                    elif unit == "cm":
+                        lines.append(f"{indent_str}motor_pair.move_for_degrees(motor_pair.PAIR_1, {sign}int({val} * 20.5), steering=0, velocity=_move_speed)")
+                    else:
+                        deg_expr = f"int({val} * 360)" if unit == "rotations" else f"int({val})"
+                        lines.append(f"{indent_str}motor_pair.move_for_degrees(motor_pair.PAIR_1, {sign}{deg_expr}, steering=0, velocity=_move_speed)")
                 elif opcode == "flippermove_stopMove":
                     lines.append(f"{indent_str}motor_pair.stop(motor_pair.PAIR_1)")
                 elif opcode == "flippermove_steer":
-                    lines.append(f"{indent_str}# movement.steer({get_in('STEERING')}, {get_in('VALUE')}) — use motor_pair.move")
+                    val = get_in("VALUE")
+                    steering = get_in("STEERING")
+                    unit = get_field("UNIT", "rotations")
+                    if unit == "seconds":
+                        lines.append(f"{indent_str}motor_pair.move_for_time(motor_pair.PAIR_1, int({val} * 1000), steering=int({steering}), velocity=_move_speed)")
+                    else:
+                        deg_expr = f"int({val} * 360)" if unit == "rotations" else f"int({val})"
+                        lines.append(f"{indent_str}motor_pair.move_for_degrees(motor_pair.PAIR_1, {deg_expr}, steering=int({steering}), velocity=_move_speed)")
                 elif opcode == "flippermotor_motorTurnForDirection":
                     direction = str(get_in('DIRECTION')).strip().strip("'\"")
                     sign = "-" if direction == "counterclockwise" else ""
@@ -274,7 +291,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 elif opcode == "flippermoremove_startDualSpeed":
                     left = get_in('LEFT')
                     right = get_in('RIGHT')
-                    lines.append(f"{indent_str}motor_pair.move_tank(motor_pair.PAIR_1, int({left}), int({right}))")
+                    lines.append(f"{indent_str}motor_pair.move_tank_duty_cycle(motor_pair.PAIR_1, int({left}), int({right}))")
                 elif opcode == "flippermoremotor_motorStartPower":
                     for p in s3_ports_list(get_in('PORT')):
                         lines.append(f"{indent_str}motor.run({p}, int({get_in('POWER')} * 10))")
@@ -390,6 +407,9 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         output.append("import time")
         output.append("import math")
         output.append("from hub import port")
+        output.append("")
+        output.append("# Default movement speed (500 deg/s = 50%)")
+        output.append("_move_speed = 500")
         output.append("")
         output.append("# Timer helpers (replaces SPIKE 2.x sensors.timer)")
         output.append("_timer_start = time.ticks_ms()")
