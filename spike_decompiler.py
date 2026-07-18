@@ -248,6 +248,10 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     pair_raw = str(get_in('PAIR')).strip().strip("'\"")
                     if len(pair_raw) >= 2:
                         p1, p2 = pair_raw[0].upper(), pair_raw[1].upper()
+                        lines.append(f"{indent_str}try:")
+                        lines.append(f"{indent_str}    motor_pair.unpair(motor_pair.PAIR_1)")
+                        lines.append(f"{indent_str}except Exception:")
+                        lines.append(f"{indent_str}    pass")
                         lines.append(f"{indent_str}motor_pair.pair(motor_pair.PAIR_1, port.{p1}, port.{p2})")
                     else:
                         lines.append(f"{indent_str}# movement.pair({get_in('PAIR')}) — update ports manually")
@@ -386,12 +390,6 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         output.append("import time")
         output.append("import math")
         output.append("from hub import port")
-        output.append("")
-        output.append("# Motor pair setup (default PAIR_1)")
-        output.append("try:")
-        output.append("    motor_pair.pair(motor_pair.PAIR_1, port.E, port.A)")
-        output.append("except Exception:")
-        output.append("    pass")
         output.append("")
         output.append("# Timer helpers (replaces SPIKE 2.x sensors.timer)")
         output.append("_timer_start = time.ticks_ms()")
