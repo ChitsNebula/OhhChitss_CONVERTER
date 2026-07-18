@@ -189,12 +189,12 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
             elif opcode == "flippersensors_orientationAxis":
                 axis = get_field("AXIS", "yaw").lower()
                 if axis == "yaw":
-                    return "hub.imu.heading()"
+                    return "hub.motion_sensor.get_yaw_angle()"
                 else:
                     idx = {"roll": 0, "pitch": 1}.get(axis, 0)
-                    return f"(hub.imu.tilt_angles()[{idx}] / 10)"
+                    return f"(hub.motion_sensor.tilt_angles()[{idx}] / 10)"
             elif opcode == "flippersensors_tiltAngle":
-                return "(hub.imu.tilt_angles()[0] / 10)"
+                return "(hub.motion_sensor.tilt_angles()[0] / 10)"
             elif opcode == "flippersensors_timer":
                 return "_timer()"
             elif opcode == "flippersensors_resetTimer":
@@ -279,7 +279,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     for p in s3_ports_list(get_in('PORT')):
                         lines.append(f"{indent_str}motor.run({p}, int({get_in('POWER')} * 10))")
                 elif opcode == "flippersensors_resetYaw":
-                    lines.append(f"{indent_str}hub.imu.reset_heading(0)")
+                    lines.append(f"{indent_str}hub.motion_sensor.reset_yaw(0)")
                 elif opcode == "flippermoremotor_motorSetDegreeCounted":
                     for p in s3_ports_list(get_in('PORT')):
                         lines.append(f"{indent_str}motor.reset_relative_position({p}, {get_in('VALUE')})")
