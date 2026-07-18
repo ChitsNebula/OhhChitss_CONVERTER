@@ -1082,8 +1082,56 @@ class Recompiler:
                             if isinstance(cmp, ast.Name):
                                 self.list_names.add(cmp.id)
 
-        x_off, y_off = 100, 100
+        # Position tracking to avoid overlapping top-level stacks
+        used_positions = set()
+        stack_counter = 1
 
+        def alloc_position(pref_x, pref_y):
+            nonlocal stack_counter
+            grid_cell = (round(pref_x / 300), round(pref_y / 300))
+            if grid_cell not in used_positions and not (pref_x == 100 and pref_y == 100 and len(used_positions) > 0):
+                used_positions.add(grid_cell)
+                return pref_x, pref_y
+            
+            # Compute distinct grid tile layout
+            col = stack_counter % 2
+            row = stack_counter // 2
+            stack_counter += 1
+            gx = 100 + col * 750
+            gy = 100 + row * 900
+            new_cell = (round(gx / 300), round(gy / 300))
+            used_positions.add(new_cell)
+            return gx, gy
+
+        # Compile main / top-level first so it's placed top-left
+        main_x, main_y = alloc_position(self.orig_main_coords[0], self.orig_main_coords[1])
+        main_found = False
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef) and node.name == "main":
+                main_found = True
+                ev_bid = gen_id()
+                self.add_block(ev_bid, "flipperevents_whenProgramStarts",
+                               top_level=True, x=main_x, y=main_y)
+                body_nodes = [n for n in node.body
+                              if not isinstance(n, (ast.Global, ast.Return))]
+                body_ids = self.compile_body(body_nodes, ev_bid)
+                if body_ids:
+                    self.blocks[ev_bid]["next"] = body_ids[0]
+                    self.blocks[body_ids[0]]["parent"] = ev_bid
+                break
+
+        if not main_found:
+            top_stmts = [n for n in tree.body
+                         if not isinstance(n, (ast.Import, ast.ImportFrom,
+                                               ast.FunctionDef))]
+            if top_stmts:
+                ev_bid = gen_id()
+                self.add_block(ev_bid, "flipperevents_whenProgramStarts",
+                               top_level=True, x=main_x, y=main_y)
+                body_ids = self.compile_body(top_stmts, ev_bid)
+                if body_ids:
+                    self.blocks[ev_bid]["next"] = body_ids[0]
+                    self.blocks[body_ids[0]]["parent"] = ev_bid
 
         # Compile function definitions
         for node in tree.body:
@@ -1130,7 +1178,8 @@ class Recompiler:
 
             import unicodedata
             func_name_norm = unicodedata.normalize('NFKC', func_name)
-            px, py = self.orig_coords.get(func_name_norm, (x_off, y_off))
+            raw_px, raw_py = self.orig_coords.get(func_name_norm, (100, 100))
+            px, py = alloc_position(raw_px, raw_py)
             self.blocks[def_bid] = {
                 "opcode": "procedures_definition",
                 "next": None, "parent": None,
@@ -1138,9 +1187,6 @@ class Recompiler:
                 "fields": {}, "shadow": False, "topLevel": True,
                 "x": px, "y": py,
             }
-            if func_name_norm not in self.orig_coords:
-                y_off += 350
-
 
             self.curr_func = func_name
             body_nodes = [n for n in node.body
@@ -1150,36 +1196,6 @@ class Recompiler:
                 self.blocks[def_bid]["next"] = body_ids[0]
                 self.blocks[body_ids[0]]["parent"] = def_bid
             self.curr_func = None
-
-        # Compile main / top-level
-        main_found = False
-        main_x, main_y = self.orig_main_coords
-        for node in tree.body:
-            if isinstance(node, ast.FunctionDef) and node.name == "main":
-                main_found = True
-                ev_bid = gen_id()
-                self.add_block(ev_bid, "flipperevents_whenProgramStarts",
-                               top_level=True, x=main_x, y=main_y)
-                body_nodes = [n for n in node.body
-                              if not isinstance(n, (ast.Global, ast.Return))]
-                body_ids = self.compile_body(body_nodes, ev_bid)
-                if body_ids:
-                    self.blocks[ev_bid]["next"] = body_ids[0]
-                    self.blocks[body_ids[0]]["parent"] = ev_bid
-                break
-
-        if not main_found:
-            top_stmts = [n for n in tree.body
-                         if not isinstance(n, (ast.Import, ast.ImportFrom,
-                                               ast.FunctionDef))]
-            if top_stmts:
-                ev_bid = gen_id()
-                self.add_block(ev_bid, "flipperevents_whenProgramStarts",
-                               top_level=True, x=main_x, y=main_y)
-                body_ids = self.compile_body(top_stmts, ev_bid)
-                if body_ids:
-                    self.blocks[ev_bid]["next"] = body_ids[0]
-                    self.blocks[body_ids[0]]["parent"] = ev_bid
 
 
         return self.blocks, self.variables, self.warnings
