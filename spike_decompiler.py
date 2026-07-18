@@ -370,8 +370,10 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 arg_names = [clean_identifier(name) for name in json.loads(proto["mutation"]["argumentnames"])]
                 clean_name = clean_identifier(re.sub(r'%[snb]', '', proc_code).strip())
                 output.append(f"def {clean_name}({', '.join(arg_names)}):")
-                if global_vars:
-                    output.append(f"    global {', '.join(global_vars)}")
+                # Filter out parameter names from global declaration to avoid SyntaxError
+                filtered_globals = [g for g in global_vars if g not in arg_names]
+                if filtered_globals:
+                    output.append(f"    global {', '.join(filtered_globals)}")
                 body_start_id = b.get("next")
                 if body_start_id:
                     output.append(decompile_chain(body_start_id, indent=1))
