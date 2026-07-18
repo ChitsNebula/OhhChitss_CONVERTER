@@ -300,9 +300,9 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     pass  # shadow menu block, consumed by parent
 
                 elif opcode == "flippersound_beepForTime":
-                    lines.append(f"{indent_str}hub.speaker.beep(int({get_in('NOTE')}), int({get_in('DURATION')} * 1000))")
+                    lines.append(f"{indent_str}sound.beep(int({get_in('NOTE')}), int({get_in('DURATION')} * 1000))")
                 elif opcode == "sound_setvolumeto":
-                    lines.append(f"{indent_str}hub.speaker.volume(int({get_in('VOLUME')}))")
+                    lines.append(f"{indent_str}sound.volume(int({get_in('VOLUME')}))")
                 elif opcode == "flippercontrol_stop":
                     lines.append(f"{indent_str}raise SystemExit")
                 elif opcode == "control_wait":
@@ -383,6 +383,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         output.append("import color_sensor")
         output.append("import distance_sensor")
         output.append("import force_sensor")
+        output.append("import sound")
         output.append("import time")
         output.append("import math")
         output.append("from hub import port")
