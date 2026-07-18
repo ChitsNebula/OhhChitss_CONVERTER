@@ -76,8 +76,13 @@ class Recompiler:
         return [3, [12, name, vid], [10, ""]]
 
     def port_input(self, node, parent_id, selector_type):
+        port_val = None
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             port_val = node.value
+        elif isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id == "port":
+            port_val = node.attr
+
+        if port_val:
             shadow_id = gen_id(length=12)
             field_name = f"field_{selector_type}"
             if "menu_acceleration" in selector_type:
@@ -109,6 +114,20 @@ class Recompiler:
     def expr_to_input(self, node, parent_id):
         if node is None:
             return self.lit_input(0)
+
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "int":
+            arg0 = node.args[0] if node.args else ast.Constant(value=0)
+            if isinstance(arg0, ast.Constant) and isinstance(arg0.value, str):
+                try:
+                    if '.' in arg0.value:
+                        arg0 = ast.Constant(value=float(arg0.value))
+                    else:
+                        arg0 = ast.Constant(value=int(arg0.value))
+                except ValueError:
+                    pass
+            if isinstance(arg0, ast.BinOp) and isinstance(arg0.op, ast.Mult) and isinstance(arg0.right, ast.Constant) and arg0.right.value in (1000, 10):
+                arg0 = arg0.left
+            return self.expr_to_input(arg0, parent_id)
 
         if isinstance(node, ast.Constant):
             return self.lit_input(node.value)
@@ -283,7 +302,7 @@ class Recompiler:
             self.add_block(bid, "flippersensors_color", parent_id=parent_id, inputs=inputs)
             return bid
 
-        if obj == "color_sensor" and method == "reflectivity":
+        if obj == "color_sensor" and method in ("reflectivity", "reflection"):
             port = args[0] if args else ast.Constant(value="A")
             self.add_block(bid, "flippersensors_reflectivity", parent_id=parent_id,
                            inputs={"PORT": self.port_input(port, bid, "flippersensors_color-sensor-selector")})
@@ -299,19 +318,19 @@ class Recompiler:
                                    "COLOR": self.port_input(color, bid, "flippersensors_color-selector")})
             return bid
 
-        if obj == "distance_sensor" and method == "get_distance_percentage":
+        if obj == "distance_sensor" and method in ("get_distance_percentage", "distance"):
             port = args[0] if args else ast.Constant(value="A")
             self.add_block(bid, "flippersensors_distance", parent_id=parent_id,
                            inputs={"PORT": self.port_input(port, bid, "flippersensors_distance-sensor-selector")})
             return bid
 
-        if obj == "force_sensor" and method == "get_force_newton":
+        if obj == "force_sensor" and method in ("get_force_newton", "force"):
             port = args[0] if args else ast.Constant(value="A")
             self.add_block(bid, "flippersensors_force", parent_id=parent_id,
                            inputs={"PORT": self.port_input(port, bid, "flippersensors_force-sensor-selector")})
             return bid
 
-        if obj == "force_sensor" and method == "is_pressed":
+        if obj == "force_sensor" and method in ("is_pressed", "pressed"):
             port = args[0] if args else ast.Constant(value="F")
             opt_val = args[1].value if len(args) > 1 and isinstance(args[1], ast.Constant) else "pressed"
             self.add_block(bid, "flippersensors_isPressed", parent_id=parent_id,
@@ -319,18 +338,20 @@ class Recompiler:
                            fields={"OPTION": [opt_val, None]})
             return bid
 
-        if obj == "motor" and method == "position":
+        if obj == "motor" and method in ("position", "relative_position", "degrees_counted"):
             port = args[0] if args else ast.Constant(value="A")
             sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_position", parent_id=parent_id,
                            inputs={"PORT": self.port_input(port, bid, sel_type)})
             return bid
 
-        if obj == "motor" and method == "degrees_counted":
-            port = args[0] if args else ast.Constant(value="A")
-            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
-            self.add_block(bid, "flippermoremotor_degrees", parent_id=parent_id,
-                           inputs={"PORT": self.port_input(port, bid, sel_type)})
+        if (obj in ("sensors", "hub.motion") and method in ("orientation", "orientationAxis", "get_yaw_angle")) or (obj is None and method == "_get_yaw"):
+            shadow_id = gen_id(length=12)
+            self.add_block(shadow_id, "flippersensors_custom-icon-orientation", parent_id=bid, fields={
+                "field_flippersensors_custom-icon-orientation": ["yaw", None]
+            }, shadow=True)
+            self.add_block(bid, "flippersensors_orientationAxis", parent_id=parent_id,
+                           inputs={"AXIS": [1, shadow_id]})
             return bid
 
 
@@ -348,6 +369,16 @@ class Recompiler:
                 self.add_block(bid, "data_lengthoflist", parent_id=parent_id,
                                fields={"LIST": [target.id, vid]})
                 return bid
+
+        if (obj == "sensors" and method in ("orientation", "orientationAxis")) or (obj is None and method == "_get_yaw"):
+            axis = args[0].value if args and isinstance(args[0], ast.Constant) else "yaw"
+            shadow_id = gen_id(length=12)
+            self.add_block(shadow_id, "flippersensors_custom-icon-orientation", parent_id=bid, fields={
+                "field_flippersensors_custom-icon-orientation": [axis, None]
+            }, shadow=True)
+            self.add_block(bid, "flippersensors_orientationAxis", parent_id=parent_id,
+                           inputs={"AXIS": [1, shadow_id]})
+            return bid
 
         if isinstance(node.func, ast.Attribute):
             # hub.motion.orientation
@@ -548,6 +579,21 @@ class Recompiler:
         if isinstance(node, ast.Expr):
             return []
 
+        if isinstance(node, ast.Try):
+            return self.compile_body(node.body, parent_id)
+
+        if isinstance(node, ast.Assign):
+            if len(node.targets) == 1 and isinstance(node.targets[0], ast.Name) and node.targets[0].id == "_move_speed":
+                spd_expr = node.value
+                if isinstance(spd_expr, ast.Call) and isinstance(spd_expr.func, ast.Name) and spd_expr.func.id == "int" and spd_expr.args:
+                    spd_expr = spd_expr.args[0]
+                if isinstance(spd_expr, ast.BinOp) and isinstance(spd_expr.op, ast.Mult) and isinstance(spd_expr.right, ast.Constant) and spd_expr.right.value == 10:
+                    spd_expr = spd_expr.left
+                bid = gen_id()
+                self.add_block(bid, "flippermove_movementSpeed", parent_id=parent_id,
+                               inputs={"SPEED": self.expr_to_input(spd_expr, bid)})
+                return [bid]
+
         self.warnings.append(f"Unsupported statement '{type(node).__name__}' — skipped")
         return []
 
@@ -565,7 +611,77 @@ class Recompiler:
             n = get_kwarg(key, default)
             return n.value if isinstance(n, ast.Constant) else default
 
-        # ── movement ──────────────────────────────────────────────────────
+        # ── motor_pair (SPIKE 3.x) ─────────────────────────────────────────
+        if obj == "motor_pair":
+            if method == "pair":
+                p1_node = get_arg(1, "E")
+                p2_node = get_arg(2, "A")
+                p1_str = p1_node.attr if isinstance(p1_node, ast.Attribute) else (p1_node.value if isinstance(p1_node, ast.Constant) else "E")
+                p2_str = p2_node.attr if isinstance(p2_node, ast.Attribute) else (p2_node.value if isinstance(p2_node, ast.Constant) else "A")
+                pair_str = f"{p1_str}{p2_str}"
+                self.add_block(bid, "flippermove_setMovementPair", parent_id=parent_id,
+                               inputs={"PAIR": self.port_input(ast.Constant(value=pair_str), bid, "flippermove_movement-port-selector")})
+                return [bid]
+
+            if method in ("move_tank", "move_tank_duty_cycle"):
+                left_arg = get_arg(1, 50)
+                right_arg = get_arg(2, 50)
+                def unwrap_mult10(n):
+                    if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "int" and n.args:
+                        n = n.args[0]
+                    if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Mult) and isinstance(n.right, ast.Constant) and n.right.value == 10:
+                        return n.left
+                    return n
+                self.add_block(bid, "flippermoremove_startDualSpeed", parent_id=parent_id,
+                               inputs={"LEFT": self.expr_to_input(unwrap_mult10(left_arg), bid),
+                                       "RIGHT": self.expr_to_input(unwrap_mult10(right_arg), bid)})
+                return [bid]
+
+            if method in ("move_for_degrees", "move_for_time"):
+                val_node = get_arg(1, 0)
+                dir_str = "forward"
+                if isinstance(val_node, ast.UnaryOp) and isinstance(val_node.op, ast.USub):
+                    dir_str = "back"
+                    val_node = val_node.operand
+                elif isinstance(val_node, ast.Constant) and isinstance(val_node.value, (int, float)) and val_node.value < 0:
+                    dir_str = "back"
+                    val_node = ast.Constant(value=abs(val_node.value))
+
+                unit_str = "rotations"
+                if isinstance(val_node, ast.Call) and isinstance(val_node.func, ast.Name) and val_node.func.id == "int" and val_node.args:
+                    val_node = val_node.args[0]
+                if isinstance(val_node, ast.BinOp) and isinstance(val_node.op, ast.Mult) and isinstance(val_node.right, ast.Constant) and val_node.right.value in (360, 1000):
+                    if val_node.right.value == 1000:
+                        unit_str = "seconds"
+                    val_node = val_node.left
+
+                st_node = get_kwarg("steering", 0)
+                has_steering = False
+                if isinstance(st_node, ast.Constant) and st_node.value != 0:
+                    has_steering = True
+                elif not isinstance(st_node, ast.Constant):
+                    has_steering = True
+
+                if has_steering:
+                    self.add_block(bid, "flippermove_steer", parent_id=parent_id,
+                                   inputs={"STEERING": self.expr_to_input(st_node, bid),
+                                           "VALUE": self.expr_to_input(val_node, bid)},
+                                   fields={"UNIT": [unit_str, None]})
+                else:
+                    self.add_block(bid, "flippermove_move", parent_id=parent_id,
+                                   inputs={"VALUE": self.expr_to_input(val_node, bid),
+                                           "DIRECTION": self.direction_input(ast.Constant(value=dir_str), bid, "flippermove_custom-icon-direction")},
+                                   fields={"UNIT": [unit_str, None]})
+                return [bid]
+
+            if method == "stop":
+                self.add_block(bid, "flippermove_stopMove", parent_id=parent_id)
+                return [bid]
+
+            if method == "unpair":
+                return []
+
+        # ── movement (legacy) ─────────────────────────────────────────────
         if obj == "movement" and method == "move":
             unit = get_kwarg_str("unit", "cm")
             self.add_block(bid, "flippermove_move", parent_id=parent_id,
@@ -608,31 +724,51 @@ class Recompiler:
             return [bid]
 
         # ── motor ─────────────────────────────────────────────────────────
-        if obj == "motor" and method == "turn":
-            unit = get_kwarg_str("unit", "degrees")
+        if obj == "motor" and method in ("run_for_degrees", "turn"):
             port = get_arg(0, "A")
-            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
+            deg_node = get_arg(1, 0)
+            dir_str = "clockwise"
+            if isinstance(deg_node, ast.UnaryOp) and isinstance(deg_node.op, ast.USub):
+                dir_str = "counterclockwise"
+                deg_node = deg_node.operand
+            elif isinstance(deg_node, ast.Constant) and isinstance(deg_node.value, (int, float)) and deg_node.value < 0:
+                dir_str = "counterclockwise"
+                deg_node = ast.Constant(value=abs(deg_node.value))
+
+            unit_str = "rotations"
+            if isinstance(deg_node, ast.Call) and isinstance(deg_node.func, ast.Name) and deg_node.func.id == "int" and deg_node.args:
+                deg_node = deg_node.args[0]
+            if isinstance(deg_node, ast.BinOp) and isinstance(deg_node.op, ast.Mult) and isinstance(deg_node.right, ast.Constant) and deg_node.right.value == 360:
+                deg_node = deg_node.left
+
+            sel_type = "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermotor_motorTurnForDirection", parent_id=parent_id,
-                           inputs={"PORT":      self.port_input(port, bid, sel_type),
-                                   "DIRECTION": self.direction_input(get_arg(1, "clockwise"), bid, "flippermotor_custom-icon-direction"),
-                                   "VALUE":     self.expr_to_input(get_arg(2, 0), bid)},
-                           fields={"UNIT": [unit, None]})
+                           inputs={"PORT": self.port_input(port, bid, sel_type),
+                                   "DIRECTION": self.direction_input(ast.Constant(value=dir_str), bid, "flippermotor_custom-icon-direction"),
+                                   "VALUE": self.expr_to_input(deg_node, bid)},
+                           fields={"UNIT": [unit_str, None]})
             return [bid]
 
-        if obj == "motor" and method == "start_power":
+        if obj == "motor" and method in ("run", "start_power"):
             port = get_arg(0, "A")
-            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
+            power_node = get_arg(1, 50)
+            if isinstance(power_node, ast.Call) and isinstance(power_node.func, ast.Name) and power_node.func.id == "int" and power_node.args:
+                power_node = power_node.args[0]
+            if isinstance(power_node, ast.BinOp) and isinstance(power_node.op, ast.Mult) and isinstance(power_node.right, ast.Constant) and power_node.right.value == 10:
+                power_node = power_node.left
+            sel_type = "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorStartPower", parent_id=parent_id,
-                           inputs={"PORT":  self.port_input(port, bid, sel_type),
-                                   "POWER": self.expr_to_input(get_arg(1, 50), bid)})
+                           inputs={"PORT": self.port_input(port, bid, sel_type),
+                                   "POWER": self.expr_to_input(power_node, bid)})
             return [bid]
 
-        if obj == "motor" and method == "set_degrees_counted":
+        if obj == "motor" and method in ("reset_relative_position", "set_degrees_counted"):
             port = get_arg(0, "A")
-            sel_type = "flippermotor_multiple-port-selector" if isinstance(port, ast.Constant) and isinstance(port.value, str) and len(port.value) > 1 else "flippermotor_single-motor-selector"
+            val_node = get_arg(1, 0)
+            sel_type = "flippermotor_single-motor-selector"
             self.add_block(bid, "flippermoremotor_motorSetDegreeCounted", parent_id=parent_id,
-                           inputs={"PORT":  self.port_input(port, bid, sel_type),
-                                   "VALUE": self.expr_to_input(get_arg(1, 0), bid)})
+                           inputs={"PORT": self.port_input(port, bid, sel_type),
+                                   "VALUE": self.expr_to_input(val_node, bid)})
             return [bid]
 
         if obj == "motor" and method == "go_to_relative_position":
@@ -817,10 +953,26 @@ class Recompiler:
             method = node.func.attr
             if isinstance(val, ast.Name):
                 obj = val.id
+            elif isinstance(val, ast.Attribute) and isinstance(val.value, ast.Name) and val.value.id == "hub":
+                if val.attr in ("sound", "speaker"):
+                    obj = "sound"
+                elif val.attr in ("motion_sensor", "motion", "imu"):
+                    obj = "sensors"
+                else:
+                    obj = val.attr
             else:
                 obj = None
         elif isinstance(node.func, ast.Name):
             obj, method = None, node.func.id
+            if method in ("_reset_yaw", "_reset_timer"):
+                obj = "sensors"
+                method = "reset_yaw" if method == "_reset_yaw" else "reset_timer"
+            elif method == "_get_yaw":
+                obj = "hub.motion"
+                method = "orientation"
+            elif method == "_timer":
+                obj = "time"
+                method = "time"
         else:
             obj, method = None, "unknown"
         args   = node.args
@@ -873,7 +1025,7 @@ class Recompiler:
 
         # Pass 1: collect procedure signatures
         for node in tree.body:
-            if isinstance(node, ast.FunctionDef) and node.name != "main":
+            if isinstance(node, ast.FunctionDef) and node.name not in ("main", "_get_yaw", "_reset_yaw", "_reset_timer", "_timer"):
                 arg_names = [a.arg for a in node.args.args]
                 arg_ids   = [gen_id() for _ in arg_names]
 
@@ -935,7 +1087,7 @@ class Recompiler:
 
         # Compile function definitions
         for node in tree.body:
-            if not (isinstance(node, ast.FunctionDef) and node.name != "main"):
+            if not (isinstance(node, ast.FunctionDef) and node.name not in ("main", "_get_yaw", "_reset_yaw", "_reset_timer", "_timer")):
                 continue
             func_name = node.name
             if func_name not in self.procedures:
