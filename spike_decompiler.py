@@ -17,6 +17,13 @@ def clean_identifier(name):
         cleaned = cleaned + "_"
     return cleaned
 
+def s3_port(val):
+    """Convert port string like 'A' to port.A for SPIKE 3"""
+    s = str(val).strip().strip("'\"")
+    if len(s) == 1 and s.upper() in 'ABCDEF':
+        return f"port.{s.upper()}"
+    return val
+
 def generate_random_id(length=12):
     chars = string.ascii_letters + string.digits
     return "".join(random.choice(chars) for _ in range(length))
@@ -154,40 +161,41 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 return f"({get_in('LOW')} <= {get_in('VALUE')} <= {get_in('HIGH')})"
 
             elif opcode == "flippersensors_reflectivity":
-                return f"color_sensor.reflectivity({get_in('PORT')})"
+                return f"color_sensor.reflection({s3_port(get_in('PORT'))})"
             elif opcode == "flippersensors_isReflectivity":
                 cmp = get_field("COMPARATOR", "<")
-                return f"(color_sensor.reflectivity({get_in('PORT')}) {cmp} {get_in('VALUE')})"
+                return f"(color_sensor.reflection({s3_port(get_in('PORT'))}) {cmp} {get_in('VALUE')})"
             elif opcode == "flippersensors_isColor":
-                return f"color_sensor.is_color({get_in('PORT')}, {get_in('COLOR')})"
+                return f"color_sensor.color({s3_port(get_in('PORT'))}) == {get_in('COLOR')}"
             elif opcode == "flippersensors_color":
-                # detect color reporter (no port input — uses current color sensor)
-                port = get_in('PORT', None)
-                if port and port != 'None':
-                    return f"color_sensor.color({port})"
-                return "color_sensor.color()"
+                port_val = get_in('PORT', None)
+                if port_val and port_val != 'None':
+                    return f"color_sensor.color({s3_port(port_val)})"
+                return "color_sensor.color(port.C)"
             elif opcode == "flippersensors_distance":
-                return f"distance_sensor.get_distance_percentage({get_in('PORT')})"
+                return f"distance_sensor.distance({s3_port(get_in('PORT'))})"
             elif opcode == "flippersensors_force":
-                return f"force_sensor.get_force_newton({get_in('PORT')})"
+                return f"force_sensor.force({s3_port(get_in('PORT'))})"
             elif opcode == "flippersensors_isPressed":
-                opt = get_field("OPTION", "pressed")
-                return f"force_sensor.is_pressed({get_in('PORT')}, '{opt}')"
+                return f"force_sensor.pressed({s3_port(get_in('PORT'))})"
 
             elif opcode == "flippersensors_orientationAxis":
-                axis = get_field("AXIS")
-                return f"hub.motion.orientation('{axis}')"
+                axis = get_field("AXIS", "yaw").lower()
+                if axis == "yaw":
+                    return "hub.imu.heading()"
+                else:
+                    idx = {"roll": 0, "pitch": 1}.get(axis, 0)
+                    return f"(hub.imu.tilt_angles()[{idx}] / 10)"
             elif opcode == "flippersensors_tiltAngle":
-                axis = get_field("AXIS", "pitch")
-                return f"hub.motion.tilt_angles()[0]"
+                return "(hub.imu.tilt_angles()[0] / 10)"
             elif opcode == "flippersensors_timer":
-                return "time.time()"
+                return "_timer()"
             elif opcode == "flippersensors_resetTimer":
-                return "0"  # timer reset has no Python equivalent
+                return "_timer()"  # expression context — return current timer
             elif opcode == "flippermoremotor_position":
-                return f"motor.position({get_in('PORT')})"
+                return f"motor.relative_position({s3_port(get_in('PORT'))})"
             elif opcode == "flippermoremotor_degrees":
-                return f"motor.degrees_counted({get_in('PORT')})"
+                return f"motor.relative_position({s3_port(get_in('PORT'))})"
 
             elif opcode == "procedures_call":
                 proc_code = b["mutation"]["proccode"]
@@ -230,50 +238,62 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     lines.append(f"{indent_str}{var_name} += {get_in('VALUE')}")
 
                 elif opcode == "flippermove_setMovementPair":
-                    lines.append(f"{indent_str}movement.pair({get_in('PAIR')})")
+                    pair_raw = str(get_in('PAIR')).strip().strip("'\"")
+                    if len(pair_raw) >= 2:
+                        p1, p2 = pair_raw[0].upper(), pair_raw[1].upper()
+                        lines.append(f"{indent_str}motor_pair.pair(motor_pair.PAIR_1, port.{p1}, port.{p2})")
+                    else:
+                        lines.append(f"{indent_str}# movement.pair({get_in('PAIR')}) — update ports manually")
                 elif opcode == "flippermove_movementSpeed":
-                    lines.append(f"{indent_str}movement.speed({get_in('SPEED')})")
+                    lines.append(f"{indent_str}# movement.speed({get_in('SPEED')}) — set via motor_pair velocity directly")
                 elif opcode == "flippermove_move":
-                    lines.append(f"{indent_str}movement.move({get_in('VALUE')}, unit='{get_field('UNIT')}', direction={get_in('DIRECTION')})")
+                    lines.append(f"{indent_str}# movement.move({get_in('VALUE')}, unit='{get_field('UNIT')}') — convert to motor_pair.move_for_degrees")
                 elif opcode == "flippermove_stopMove":
-                    lines.append(f"{indent_str}movement.stop()")
+                    lines.append(f"{indent_str}motor_pair.stop(motor_pair.PAIR_1)")
                 elif opcode == "flippermove_steer":
-                    lines.append(f"{indent_str}movement.steer({get_in('STEERING')}, {get_in('VALUE')}, unit='{get_field('UNIT')}')")
+                    lines.append(f"{indent_str}# movement.steer({get_in('STEERING')}, {get_in('VALUE')}) — use motor_pair.move")
                 elif opcode == "flippermotor_motorTurnForDirection":
-                    lines.append(f"{indent_str}motor.turn({get_in('PORT')}, {get_in('DIRECTION')}, {get_in('VALUE')}, unit='{get_field('UNIT')}')")
+                    direction = str(get_in('DIRECTION')).strip().strip("'\"")
+                    sign = "-" if direction == "counterclockwise" else ""
+                    val = get_in('VALUE')
+                    unit = get_field('UNIT', 'rotations')
+                    deg_expr = f"int({val} * 360)" if unit == 'rotations' else str(val)
+                    lines.append(f"{indent_str}motor.run_for_degrees({s3_port(get_in('PORT'))}, {sign}{deg_expr}, 500)")
                 elif opcode == "flippermoremove_startDualSpeed":
-                    lines.append(f"{indent_str}movement.start_dual_speed({get_in('LEFT')}, {get_in('RIGHT')})")
+                    left = get_in('LEFT')
+                    right = get_in('RIGHT')
+                    lines.append(f"{indent_str}motor_pair.move_tank(motor_pair.PAIR_1, int({left}), int({right}))")
                 elif opcode == "flippermoremotor_motorStartPower":
-                    lines.append(f"{indent_str}motor.start_power({get_in('PORT')}, {get_in('POWER')})")
+                    lines.append(f"{indent_str}motor.run({s3_port(get_in('PORT'))}, int({get_in('POWER')} * 10))")
                 elif opcode == "flippersensors_resetYaw":
-                    lines.append(f"{indent_str}sensors.reset_yaw()")
+                    lines.append(f"{indent_str}hub.imu.reset_heading(0)")
                 elif opcode == "flippermoremotor_motorSetDegreeCounted":
-                    lines.append(f"{indent_str}motor.set_degrees_counted({get_in('PORT')}, {get_in('VALUE')})")
+                    lines.append(f"{indent_str}motor.reset_relative_position({s3_port(get_in('PORT'))}, {get_in('VALUE')})")
                 elif opcode == "flippermoremotor_motorGoToRelativePosition":
-                    speed_arg = f", speed={get_in('SPEED')}" if "SPEED" in inputs else ""
-                    lines.append(f"{indent_str}motor.go_to_relative_position({get_in('PORT')}, {get_in('POSITION')}{speed_arg})")
+                    spd = get_in('SPEED') if 'SPEED' in inputs else '500'
+                    lines.append(f"{indent_str}motor.run_for_degrees({s3_port(get_in('PORT'))}, {get_in('POSITION')}, int({spd} * 10))")
                 elif opcode == "flippermoremotor_motorSetStopMethod":
                     stop_type = get_field("STOP")
                     stop_map = {"0": "coast", "1": "brake", "2": "hold"}
                     stop_label = stop_map.get(str(stop_type), stop_type)
-                    lines.append(f"{indent_str}motor.set_stop_method({get_in('PORT')}, '{stop_label}')")
+                    lines.append(f"{indent_str}# motor.set_stop_method({s3_port(get_in('PORT'))}, '{stop_label}') — not supported in SPIKE 3")
                 elif opcode == "flippermoremotor_motorSetAcceleration":
-                    lines.append(f"{indent_str}motor.set_acceleration({get_in('PORT')}, {get_in('ACCELERATION')})")
+                    lines.append(f"{indent_str}# motor.set_acceleration({s3_port(get_in('PORT'))}, {get_in('ACCELERATION')}) — not supported in SPIKE 3")
                 elif opcode == "flippermoremove_movementSetAcceleration":
-                    lines.append(f"{indent_str}movement.set_acceleration({get_in('ACCELERATION')})")
+                    lines.append(f"{indent_str}# movement.set_acceleration({get_in('ACCELERATION')}) — not supported in SPIKE 3")
                 elif opcode == "flippermotor_motorSetSpeed":
-                    lines.append(f"{indent_str}motor.set_speed({get_in('PORT')}, {get_in('SPEED')})")
+                    lines.append(f"{indent_str}# motor.set_speed({s3_port(get_in('PORT'))}, {get_in('SPEED')}) — set speed via motor.run directly")
                 elif opcode == "flippersensors_resetTimer":
-                    lines.append(f"{indent_str}sensors.reset_timer()")
+                    lines.append(f"{indent_str}_reset_timer()")
                 elif opcode == "flippermoremotor_menu_acceleration":
                     pass  # shadow menu block, consumed by parent
 
                 elif opcode == "flippersound_beepForTime":
-                    lines.append(f"{indent_str}sound.beep({get_in('NOTE')}, {get_in('DURATION')})")
+                    lines.append(f"{indent_str}hub.speaker.beep(int({get_in('NOTE')}), int({get_in('DURATION')} * 1000))")
                 elif opcode == "sound_setvolumeto":
-                    lines.append(f"{indent_str}sound.volume({get_in('VOLUME')})")
+                    lines.append(f"{indent_str}hub.speaker.volume(int({get_in('VOLUME')}))")
                 elif opcode == "flippercontrol_stop":
-                    lines.append(f"{indent_str}sys.exit()")
+                    lines.append(f"{indent_str}raise SystemExit")
                 elif opcode == "control_wait":
                     lines.append(f"{indent_str}time.sleep({get_in('DURATION')})")
                 elif opcode == "control_wait_until":
@@ -344,14 +364,30 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
             return "\n".join(lines)
 
         output = []
-        output.append("# Translated SPIKE Prime Python Code")
-        output.append("import sys")
+        output.append("# Translated SPIKE Prime Python Code (SPIKE 3.x API)")
+        output.append("import hub")
+        output.append("import runloop")
+        output.append("import motor")
+        output.append("import motor_pair")
+        output.append("import color_sensor")
+        output.append("import distance_sensor")
+        output.append("import force_sensor")
         output.append("import time")
         output.append("import math")
-        output.append("from spike import PrimeHub, LightMatrix, Button, StatusLight, ForceSensor, MotionSensor, Speaker, ColorSensor, App, DistanceSensor, Motor, MotorGroup")
+        output.append("from hub import port")
         output.append("")
-        output.append("hub = PrimeHub()")
-        output.append("movement = MotorGroup('C', 'D') # default movement motor pair")
+        output.append("# Motor pair setup — update ports to match your robot (default: E=left, A=right)")
+        output.append("motor_pair.pair(motor_pair.PAIR_1, port.E, port.A)")
+        output.append("")
+        output.append("# Timer helpers (replaces SPIKE 2.x sensors.timer)")
+        output.append("_timer_start = time.ticks_ms()")
+        output.append("")
+        output.append("def _reset_timer():")
+        output.append("    global _timer_start")
+        output.append("    _timer_start = time.ticks_ms()")
+        output.append("")
+        output.append("def _timer():")
+        output.append("    return time.ticks_diff(time.ticks_ms(), _timer_start) / 1000.0")
         output.append("")
 
         global_vars = [clean_identifier(v[0]) for v in target.get("variables", {}).values()]
