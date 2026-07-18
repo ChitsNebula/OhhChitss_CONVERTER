@@ -24,6 +24,13 @@ def s3_port(val):
         return f"port.{s.upper()}"
     return val
 
+def s3_ports_list(val):
+    """Convert port string like 'BF' to ['port.B', 'port.F'] for SPIKE 3"""
+    s = str(val).strip().strip("'\"")
+    if s and all(c.upper() in 'ABCDEF' for c in s):
+        return [f"port.{c.upper()}" for c in s]
+    return [s3_port(val)]
+
 def generate_random_id(length=12):
     chars = string.ascii_letters + string.digits
     return "".join(random.choice(chars) for _ in range(length))
@@ -258,20 +265,24 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                     val = get_in('VALUE')
                     unit = get_field('UNIT', 'rotations')
                     deg_expr = f"int({val} * 360)" if unit == 'rotations' else str(val)
-                    lines.append(f"{indent_str}motor.run_for_degrees({s3_port(get_in('PORT'))}, {sign}{deg_expr}, 500)")
+                    for p in s3_ports_list(get_in('PORT')):
+                        lines.append(f"{indent_str}motor.run_for_degrees({p}, {sign}{deg_expr}, 500)")
                 elif opcode == "flippermoremove_startDualSpeed":
                     left = get_in('LEFT')
                     right = get_in('RIGHT')
                     lines.append(f"{indent_str}motor_pair.move_tank(motor_pair.PAIR_1, int({left}), int({right}))")
                 elif opcode == "flippermoremotor_motorStartPower":
-                    lines.append(f"{indent_str}motor.run({s3_port(get_in('PORT'))}, int({get_in('POWER')} * 10))")
+                    for p in s3_ports_list(get_in('PORT')):
+                        lines.append(f"{indent_str}motor.run({p}, int({get_in('POWER')} * 10))")
                 elif opcode == "flippersensors_resetYaw":
                     lines.append(f"{indent_str}hub.imu.reset_heading(0)")
                 elif opcode == "flippermoremotor_motorSetDegreeCounted":
-                    lines.append(f"{indent_str}motor.reset_relative_position({s3_port(get_in('PORT'))}, {get_in('VALUE')})")
+                    for p in s3_ports_list(get_in('PORT')):
+                        lines.append(f"{indent_str}motor.reset_relative_position({p}, {get_in('VALUE')})")
                 elif opcode == "flippermoremotor_motorGoToRelativePosition":
                     spd = get_in('SPEED') if 'SPEED' in inputs else '500'
-                    lines.append(f"{indent_str}motor.run_for_degrees({s3_port(get_in('PORT'))}, {get_in('POSITION')}, int({spd} * 10))")
+                    for p in s3_ports_list(get_in('PORT')):
+                        lines.append(f"{indent_str}motor.run_for_degrees({p}, {get_in('POSITION')}, int({spd} * 10))")
                 elif opcode == "flippermoremotor_motorSetStopMethod":
                     stop_type = get_field("STOP")
                     stop_map = {"0": "coast", "1": "brake", "2": "hold"}
@@ -376,8 +387,11 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
         output.append("import math")
         output.append("from hub import port")
         output.append("")
-        output.append("# Motor pair setup — update ports to match your robot (default: E=left, A=right)")
-        output.append("motor_pair.pair(motor_pair.PAIR_1, port.E, port.A)")
+        output.append("# Motor pair setup (default PAIR_1)")
+        output.append("try:")
+        output.append("    motor_pair.pair(motor_pair.PAIR_1, port.E, port.A)")
+        output.append("except Exception:")
+        output.append("    pass")
         output.append("")
         output.append("# Timer helpers (replaces SPIKE 2.x sensors.timer)")
         output.append("_timer_start = time.ticks_ms()")
