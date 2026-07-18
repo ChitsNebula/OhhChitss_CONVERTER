@@ -291,7 +291,7 @@ def decompile_spike_project(llsp3_path, output_llsp3_path):
                 elif opcode == "flippermoremove_startDualSpeed":
                     left = get_in('LEFT')
                     right = get_in('RIGHT')
-                    lines.append(f"{indent_str}motor_pair.move_tank_duty_cycle(motor_pair.PAIR_1, int({left}), int({right}))")
+                    lines.append(f"{indent_str}motor_pair.move_tank(motor_pair.PAIR_1, int(({left}) * 10), int(({right}) * 10))")
                 elif opcode == "flippermoremotor_motorStartPower":
                     for p in s3_ports_list(get_in('PORT')):
                         lines.append(f"{indent_str}motor.run({p}, int({get_in('POWER')} * 10))")
